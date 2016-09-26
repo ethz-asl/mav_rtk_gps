@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 #
-#  Title:        piksi_node.py
+#  Title:        piksi.py
 #  Description:  ROS Driver for the Piksi RTK GPS module
-#  Dependencies: piksi_tool (https://github.com/swift-nav/piksi_tools), tested with v1.1.4
+#  Dependencies: piksi_tool (https://github.com/swift-nav/piksi_tools), tested with v1.2.1
 #
 
 import rospy
