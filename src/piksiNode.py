@@ -12,7 +12,7 @@ import sys
 # Import message types
 from std_msgs.msg import Header
 from sensor_msgs.msg import NavSatFix, NavSatStatus
-from piksi_node.msg import *
+from piksi_rtk_gps.msg import *
 
 # Import Piksi SBP library
 from sbp.client.drivers.pyserial_driver import PySerialDriver
