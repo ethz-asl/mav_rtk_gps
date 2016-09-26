@@ -1,0 +1,48 @@
+
+serial_port: '/dev/ttyUSB0'
+
+# Coordinate frame of the GPS receiver with respect to the base link
+frame_id: 'base_link'
+
+# ROS message types to be published
+publish_navsatfix_rtk: true
+publish_navsatfix_spp: true
+publish_piksibaseline: true
+
+# SBP Navigation message types to be published
+publish_gps_time: false
+publish_dops: true
+publish_pos_ecef: true
+publish_pos_llh: true
+publish_baseline_ecef: true
+publish_baseline_ned: true
+publish_vel_ecef: true
+publish_vel_ned: true
+
+# Logging message types to be published
+publish_log: true
+
+# System message types to be published
+publish_heartbeat: true
+
+# Tracking message types to be published
+publish_tracking_state: true
+
+# Custom debug messages
+publish_piksidebug: true #published only if at least one of the following is pub: heartbeat, tracking_state, navsatfix_rtk
+
+# Covariances to be published in the NavSatFix message
+# Single Point Positioning (SPP)
+var_spp_x: 25
+var_spp_y: 25
+var_spp_z: 64
+
+# RTK float mode
+var_rtk_float_x: 25
+var_rtk_float_y: 25
+var_rtk_float_z: 64
+
+# RTK fix mode
+var_rtk_fix_x: 0.0049
+var_rtk_fix_y: 0.0049
+var_rtk_fix_z: 0.01

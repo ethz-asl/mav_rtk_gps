@@ -1,0 +1,7 @@
+<launch>
+  <node pkg="piksi_rtk_gps" type="piksiNode.py" name="piksi" output="screen">
+    <rosparam file="$(find piksi_rtk_gps)/cfg/piksi_driver_settings.yaml"/>
+    <!-- TODO find a better way to seth PYTHONPATH and point where libsbp has been compiled -->
+    <env name="PYTHONPATH" value="/home/marco/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/indigo/lib/python2.7/dist-packages:/home/marco/piksi/libsbp/python"/>
+  </node>
+</launch>
