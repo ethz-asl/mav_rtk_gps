@@ -8,7 +8,7 @@ Based on the work of Daniel Eckert: [Original repo](https://bitbucket.org/Daniel
 ## Dependencies
   * libsbp (tested wit: [libsbp 1.2.1](https://github.com/swift-nav/libsbp/tree/v1.2.1))
   * python-pip `apt-get install python-pip`
-  * pythpn-tox `apt-get install python-tox`
+  * python-tox `apt-get install python-tox`
   * pandoc     `apt-get install pandoc`
   
 ## Installation and Configuration
