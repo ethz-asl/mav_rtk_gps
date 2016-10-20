@@ -21,6 +21,7 @@ from sbp.navigation import *
 from sbp.logging import *
 from sbp.system import *
 from sbp.tracking import * # WARNING: tracking is part of the draft messages, could be removed in future releases of libsbp
+from sbp.piksi import * # WARNING: piksi is part of the draft messages, could be removed in future releases of libsbp
 import sbp.version
 
 import time
@@ -189,6 +190,37 @@ def publish_piksidebug_msg():
     if publish_piksidebug:
         pub_piksidebug.publish(debug_msg)
 
+def uart_state_callback(msg_raw, **metadata):
+    """
+    Callback function for SBP_MSG_UART_STATE message types.
+    Publishes msg_uart_state messages.
+    """
+    msg = MsgUartStateDepa(msg_raw)
+
+    uart_state_msg = msg_uart_state()
+
+    uart_state_msg.uart_a_tx_throughput = msg.uart_a.tx_throughput
+    uart_state_msg.uart_a_rx_throughput = msg.uart_a.rx_throughput
+    uart_state_msg.uart_a_crc_error_count = msg.uart_a.crc_error_count
+    uart_state_msg.uart_a_io_error_count = msg.uart_a.io_error_count
+    uart_state_msg.uart_a_tx_buffer_level = msg.uart_a.tx_buffer_level
+    uart_state_msg.uart_a_rx_buffer_level = msg.uart_a.rx_buffer_level
+
+    uart_state_msg.uart_b_tx_throughput = msg.uart_b.tx_throughput
+    uart_state_msg.uart_b_rx_throughput = msg.uart_b.rx_throughput
+    uart_state_msg.uart_b_crc_error_count = msg.uart_b.crc_error_count
+    uart_state_msg.uart_b_io_error_count = msg.uart_b.io_error_count
+    uart_state_msg.uart_b_tx_buffer_level = msg.uart_b.tx_buffer_level
+    uart_state_msg.uart_b_rx_buffer_level = msg.uart_b.rx_buffer_level
+
+    uart_state_msg.latency_avg = msg.latency.avg
+    uart_state_msg.latency_lmin = msg.latency.lmin
+    uart_state_msg.latency_lmax = msg.latency.lmax
+    uart_state_msg.latency_current = msg.latency.current
+
+    pub_piksi_uart_state.publish(uart_state_msg)
+
+
 # Main function.    
 if __name__ == '__main__':   
     rospy.init_node('piksi')
@@ -251,6 +283,10 @@ if __name__ == '__main__':
     if not rospy.has_param('~publish_piksidebug'):
         rospy.set_param('~publish_piksidebug', False)
     publish_piksidebug = rospy.get_param('~publish_piksidebug')
+
+    if not rospy.has_param('~publish_uart_state'):
+        rospy.set_param('~publish_uart_state', False)
+    publish_uart_state = rospy.get_param('~publish_uart_state')
 
 
     # Generate publisher and callback function for navsatfix messages
@@ -324,6 +360,10 @@ if __name__ == '__main__':
         pub_piksidebug = rospy.Publisher(rospy.get_name() + '/debug', PiksiDebug, queue_size = 10)
 
 
+    #uart state
+    if publish_uart_state:
+        handler.add_callback(uart_state_callback, msg_type=SBP_MSG_UART_STATE_DEPA)
+        pub_piksi_uart_state = rospy.Publisher(rospy.get_name() + '/uart_state', msg_uart_state, queue_size = 10)
 
     
     handler.start()

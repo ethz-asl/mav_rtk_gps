@@ -30,6 +30,7 @@ publish_tracking_state: true
 
 # Custom debug messages
 publish_piksidebug: true #published only if at least one of the following is pub: heartbeat, tracking_state, navsatfix_rtk
+publish_uart_state: true
 
 # Covariances to be published in the NavSatFix message
 # Single Point Positioning (SPP)
