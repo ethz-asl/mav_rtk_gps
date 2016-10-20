@@ -195,6 +195,7 @@ def uart_state_callback(msg_raw, **metadata):
     Callback function for SBP_MSG_UART_STATE message types.
     Publishes msg_uart_state messages.
     """
+    #for now use deprecated uart_msg, as the latest one doesn't seem to work properly with libspb 1.2.1
     msg = MsgUartStateDepa(msg_raw)
 
     uart_state_msg = msg_uart_state()
@@ -362,6 +363,7 @@ if __name__ == '__main__':
 
     #uart state
     if publish_uart_state:
+        #for now use deprecated uart_msg, as the latest one doesn't seem to work properly with libspb 1.2.1
         handler.add_callback(uart_state_callback, msg_type=SBP_MSG_UART_STATE_DEPA)
         pub_piksi_uart_state = rospy.Publisher(rospy.get_name() + '/uart_state', msg_uart_state, queue_size = 10)
 
