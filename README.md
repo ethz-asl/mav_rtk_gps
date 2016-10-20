@@ -7,6 +7,9 @@ Based on the work of Daniel Eckert: [Original repo](https://bitbucket.org/Daniel
 
 ## Dependencies
   * libsbp (tested wit: [libsbp 1.2.1](https://github.com/swift-nav/libsbp/tree/v1.2.1))
+  * python-pip `apt-get install python-pip`
+  * python-tox `apt-get install python-tox`
+  * pandoc     `apt-get install pandoc`
   
 ## Installation and Configuration
 The following code will automatically download the required version of libsbp, install it and add its python subfolder to your PYTHONPATH by adding a line in your .bashrc file.
