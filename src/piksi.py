@@ -358,14 +358,14 @@ if __name__ == '__main__':
     debug_msg.swift_nap_error = 255 #Unkown
     debug_msg.external_antenna_present = 255 #Unkown
     if publish_piksidebug:
-        pub_piksidebug = rospy.Publisher(rospy.get_name() + '/debug', PiksiDebug, queue_size = 10)
+        pub_piksidebug = rospy.Publisher(rospy.get_name() + '/debug/receiver_state', PiksiDebug, queue_size = 10)
 
 
     #uart state
     if publish_uart_state:
         #for now use deprecated uart_msg, as the latest one doesn't seem to work properly with libspb 1.2.1
         handler.add_callback(uart_state_callback, msg_type=SBP_MSG_UART_STATE_DEPA)
-        pub_piksi_uart_state = rospy.Publisher(rospy.get_name() + '/uart_state', msg_uart_state, queue_size = 10)
+        pub_piksi_uart_state = rospy.Publisher(rospy.get_name() + '/debug/uart_state', msg_uart_state, queue_size = 10)
 
     
     handler.start()
