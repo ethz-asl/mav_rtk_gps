@@ -183,11 +183,11 @@ if __name__ == '__main__':
     # Print these information in any case
     rospy.logwarn(rospy.get_name() +
                   " constant offset added to final measurements: " +
-                  str(constant_offset))
+                  str(math.degrees(constant_offset)) + " (deg)")
 
     rospy.logwarn(rospy.get_name() +
                   " declination: " +
-                  str(declination))
+                  str(math.degrees(declination)) + " (deg)")
 
     # Subscribe to magnetometer topic
     rospy.Subscriber("magnetic_field", Vector3Stamped, magnetic_field_callback)
