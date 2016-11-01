@@ -2,15 +2,24 @@
 
   <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
   	<!-- Calibration data -->
-    <rosparam param="magnetometer/offset">[-70.4161, -156.911, -142.157]</rosparam>
-    <rosparam param="magnetometer/compensation">[0.982942, -0.0183492, -0.0028793, -0.0183492, 0.979205, 0.00672142, -0.0028793, 0.00672142, 0.908295]</rosparam>
-    <rosparam param="print_debugn">True</rosparam>
+    <rosparam param="magnetometer/offset">[352.57, 500.691, 36.0921]</rosparam>
+    <rosparam param="magnetometer/compensation">[0.946845, 0.00516968, 0.0143295, 0.00516968, 0.925902, 0.0132176, 0.0143295, 0.0132176, 0.993236]</rosparam>
+
+    <!-- Other data -->
+    <rosparam param="magnetometer/declination">0.0349065850398866</rosparam> <!-- 2 degrees, in rads -->
+    <rosparam param="magnetometer/constant_offset">0.785398163397448</rosparam> <!-- 45 degrees, in rads -->
+
+    <rosparam param="print_debug">True</rosparam>
 
     <remap from="magnetic_field" to="/hawk/fcu/mag"/>
   </node>
 
   <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"
       args="bearing_from_mag/bearing_raw bearing_from_mag/bearing_avg"
+      respawn="false" output="screen" />
+
+  <node name="rqt_plot_mag_corrected" pkg="rqt_plot" type="rqt_plot"
+      args="/bearing_from_mag/mag_corrected"
       respawn="false" output="screen" />
 
 </launch>

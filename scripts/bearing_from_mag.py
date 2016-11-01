@@ -20,6 +20,7 @@ def magnetic_field_callback(magMsg):
     global num_magnetometer_reads
     global number_samples_average
     global array_bearings
+    global constant_offset
 
     # Correct magnetic filed
     raw_mag = np.array([magMsg.vector.x,
@@ -36,8 +37,8 @@ def magnetic_field_callback(magMsg):
     corrected_mag = corrected_mag / np.linalg.norm(corrected_mag)
     mag_bearing = math.atan2(corrected_mag[1], -corrected_mag[0]);
 
-    # add declination
-    mag_bearing = mag_bearing + mag_declination
+    # add declination and constant offset
+    mag_bearing = mag_bearing + mag_declination + constant_offset
 
     # publish unfiltered bearing
     pub_bearing_raw.publish(Float64(math.degrees(mag_bearing)))
@@ -149,6 +150,14 @@ if __name__ == '__main__':
             # create matrix from array
             mag_compensation = mag_compensation.reshape(3,3)
 
+    if not rospy.has_param('~magnetometer/constant_offset'):
+        constant_offset = math.pi / 4
+        #WARNING: Hummingbird version of the autopilot used to test this
+        # script has a constant offset of 45 degrees added to the
+        # magnetic field raw measurements (they're not so "raw" ...)
+    else:
+        constant_offset = rospy.get_param('~magnetometer/constant_offset')
+
     # Other Settings
     if not rospy.has_param('~number_samples_average'):
         number_samples_average = 10
@@ -167,11 +176,18 @@ if __name__ == '__main__':
 
     if print_debug:
         rospy.loginfo(rospy.get_name() +
-                      " magnetometer declination: " + str(declination))
-        rospy.loginfo(rospy.get_name() +
                       " magnetometer offset: " + str(mag_offset))
         rospy.loginfo(rospy.get_name() +
                       " magnetometer compensation: \n" + str(mag_compensation))
+
+    # Print these information in any case
+    rospy.logwarn(rospy.get_name() +
+                  " constant offset added to final measurements: " +
+                  str(constant_offset))
+
+    rospy.logwarn(rospy.get_name() +
+                  " declination: " +
+                  str(declination))
 
     # Subscribe to magnetometer topic
     rospy.Subscriber("magnetic_field", Vector3Stamped, magnetic_field_callback)
