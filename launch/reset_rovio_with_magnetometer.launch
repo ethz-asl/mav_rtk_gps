@@ -1,0 +1,30 @@
+<launch>
+
+  <!-- This is an example about how ROVIO can be reset using magnetometer data -->
+  <arg name="magnetometer_topic" default="/hawk/fcu/mag" />
+
+  <!-- Convert magnetic field to yaw angle -->
+  <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
+    <!-- Calibration data -->
+    <rosparam param="magnetometer/offset">[352.57, 500.691, 36.0921]</rosparam>
+    <rosparam param="magnetometer/compensation">[0.946845, 0.00516968, 0.0143295, 0.00516968, 0.925902, 0.0132176, 0.0143295, 0.0132176, 0.993236]</rosparam>
+
+    <!-- Other data -->
+    <rosparam param="magnetometer/declination">0.0349065850398866</rosparam> <!-- 2 degrees, in rads -->
+
+    <!-- WARNING: 45 degrees (due to hummingbird autopilot offset) + 90 degrees offset ENU North to sensor's X axis -->
+    <rosparam param="magnetometer/constant_offset">2.35619449019234</rosparam> 
+
+    <rosparam param="print_debug">False</rosparam>
+
+    <remap from="magnetic_field" to="$(arg magnetometer_topic)"/>
+  </node>
+
+  <!-- Initialize ROVIO using the imu message built using magnetic field -->
+  <node pkg="mbzirc_init_rovio" type="init_rovio_enu.py" name="init_rovio_enu" output="screen">
+    <remap from="mag_imu" to="constant_yaw_to_imu/imu" /> 
+    <!-- REMEMBER to provide the calibration data from MAV IMU to VI-sensor IMU -->
+    <!--rosparam file="$(find mbzirc_t1_startup)/cfg/msf_parameters_vision_flourish.yaml"/ -->
+  </node>
+
+</launch>
