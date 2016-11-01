@@ -12,7 +12,7 @@
 
   <!-- Rosbag raw mag -->
   <node pkg="rosbag" type="record" name="rosbag_record" respawn="true" output="screen"
-          args="-o $(find mbzirc_utils)/matlab/raw_magnetometer_bags/raw_mag
+          args="-o $(find mbzirc_init_rovio)/magnetomer_calibration/raw_magnetometer_bags/raw_mag
                    $(arg raw_mag_topic)" />
 
 </launch>
