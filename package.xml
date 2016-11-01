@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>mbzirc_init_rovio</name>
+  <version>0.0.0</version>
+  <description>
+    Nodes to initiliaze ROVIO for the Mohamed Challenge.
+  </description>
+
+  <maintainer email="marcot@ethz.ch">Marco Tranzatto</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>rovio</depend>
+  <depend>tf</depend>
+
+</package>
