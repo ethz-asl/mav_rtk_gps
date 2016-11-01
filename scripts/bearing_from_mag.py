@@ -10,8 +10,8 @@
 import rospy
 import tf.transformations as tf
 from std_msgs.msg import Float64
-from geometry_msgs.msg import Pose, Vector3Stamped, Quaternion
-from rovio.srv import SrvResetToPose
+from geometry_msgs.msg import Vector3Stamped
+from sensor_msgs.msg import Imu
 import numpy as np
 import math
 
@@ -54,14 +54,14 @@ def magnetic_field_callback(magMsg):
 
     # WARNING: we assume zero roll and zero pitch!
     q_avg = tf.quaternion_from_euler(0.0, 0.0, bearing_avg);
-    q_msg = Quaternion()
-    q_msg.w = q_avg[3]
-    q_msg.x = q_avg[0]
-    q_msg.y = q_avg[1]
-    q_msg.z = q_avg[2]
+    imu_msg = Imu()
+    imu_msg.orientation.w = q_avg[3]
+    imu_msg.orientation.x = q_avg[0]
+    imu_msg.orientation.y = q_avg[1]
+    imu_msg.orientation.z = q_avg[2]
 
     pub_bearing_avg.publish(Float64(math.degrees(bearing_avg)))
-    pub_q_bearing_avg.publish(q_msg)
+    pub_imu_bearing_avg.publish(imu_msg)
 
     # debug
     if print_debug:
@@ -195,7 +195,8 @@ if __name__ == '__main__':
     # Publishers
     pub_bearing_raw = rospy.Publisher(rospy.get_name() + '/bearing_raw', Float64, queue_size = 10)
     pub_bearing_avg = rospy.Publisher(rospy.get_name() + '/bearing_avg', Float64, queue_size = 10)
-    pub_q_bearing_avg = rospy.Publisher(rospy.get_name() + '/q_bearing_avg', Quaternion, queue_size = 10)
+    pub_imu_bearing_avg = rospy.Publisher(rospy.get_name() + '/imu_bearing_avg',
+                                          Imu, queue_size = 10)
 
     if print_debug:
         pub_mag_corrected = rospy.Publisher(rospy.get_name() + '/mag_corrected',
