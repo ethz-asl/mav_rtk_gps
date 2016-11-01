@@ -66,6 +66,13 @@ def magnetic_field_callback(magMsg):
     if print_debug:
         rospy.loginfo("bearing_avg (deg): " +
                       str(math.degrees(bearing_avg)))
+
+        mag_corrected_msg = magMsg
+        mag_corrected_msg.vector.x = corrected_mag[0]
+        mag_corrected_msg.vector.y = corrected_mag[1]
+        mag_corrected_msg.vector.z = corrected_mag[2]
+        pub_mag_corrected.publish(mag_corrected_msg)
+
     
 
 # Mitsuta mean used to average angles. This is necessary in order to avoid
@@ -173,6 +180,10 @@ if __name__ == '__main__':
     pub_bearing_raw = rospy.Publisher(rospy.get_name() + '/bearing_raw', Float64, queue_size = 10)
     pub_bearing_avg = rospy.Publisher(rospy.get_name() + '/bearing_avg', Float64, queue_size = 10)
     pub_q_bearing_avg = rospy.Publisher(rospy.get_name() + '/q_bearing_avg', Quaternion, queue_size = 10)
+
+    if print_debug:
+        pub_mag_corrected = rospy.Publisher(rospy.get_name() + '/mag_corrected',
+                                            Vector3Stamped, queue_size = 10)
 
     # Spin
     rospy.spin()
