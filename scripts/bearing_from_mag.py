@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 #
-#  Title:        yaw_hummy_horizontal.py
-#  Description:  ROS module to calculate yaw angle from magnetometer data, when the MAV is placed
-#                horizontally, i.e. WITH pitch == roll == 0 (or at leaset very small)
+#  Title:        bearing_from_mag.py
+#  Description:  ROS module to calculate bearing angle from magnetometer data, when the MAV is placed
+#                horizontally, i.e. WITH pitch == roll == 0 (or at leaset very small).
+#                If the X axis of the sensor is aligned North, then bearing is zero.
 #
 
 import rospy
@@ -18,7 +19,7 @@ def magnetic_field_callback(magMsg):
 
     global num_magnetometer_reads
     global number_samples_average
-    global array_yaw
+    global array_bearings
 
     # Correct magnetic filed
     raw_mag = np.array([magMsg.vector.x,
@@ -33,41 +34,39 @@ def magnetic_field_callback(magMsg):
     # adapted from
     # https://github.com/KristofRobot/razor_imu_9dof/blob/indigo-devel/src/Razor_AHRS/Compass.ino
     corrected_mag = corrected_mag / np.linalg.norm(corrected_mag)
-    mag_yaw = math.atan2(corrected_mag[1], -corrected_mag[0]);
+    mag_bearing = math.atan2(corrected_mag[1], -corrected_mag[0]);
 
     # add declination
-    mag_yaw = mag_yaw + mag_declination
+    mag_bearing = mag_bearing + mag_declination
 
-    # publish unfiltered yaw
-    pub_yaw_raw.publish(Float64(math.degrees(mag_yaw)))  
+    # publish unfiltered bearing
+    pub_bearing_raw.publish(Float64(math.degrees(mag_bearing)))
 
     # compute mean 
-    array_yaw[num_magnetometer_reads] = mag_yaw
+    array_bearings[num_magnetometer_reads] = mag_bearing
     num_magnetometer_reads += 1
 
     if num_magnetometer_reads >= number_samples_average:
-        num_magnetometer_reads = 0 # delte oldest samples
+        num_magnetometer_reads = 0 # delete oldest samples
 
-    yaw_avg = mitsuta_mean(array_yaw)
+    bearing_avg = mitsuta_mean(array_bearings)
 
     # WARNING: we assume zero roll and zero pitch!
-    q_avg = tf.quaternion_from_euler(0.0, 0.0, yaw_avg);
+    q_avg = tf.quaternion_from_euler(0.0, 0.0, bearing_avg);
     q_msg = Quaternion()
     q_msg.w = q_avg[3]
     q_msg.x = q_avg[0]
     q_msg.y = q_avg[1]
     q_msg.z = q_avg[2]
 
-    pub_yaw_avg.publish(Float64(math.degrees(yaw_avg)))
-    pub_q_avg.publish(q_msg)
+    pub_bearing_avg.publish(Float64(math.degrees(bearing_avg)))
+    pub_q_bearing_avg.publish(q_msg)
 
     # debug
     if print_debug:
-        rospy.loginfo(rospy.get_name() + " yaw_avg (deg): " +
-                      str(math.degrees(yaw_avg)))
+        rospy.loginfo("bearing_avg (deg): " +
+                      str(math.degrees(bearing_avg)))
     
-        
-
 
 # Mitsuta mean used to average angles. This is necessary in order to avoid
 # misleading behaviours. For example, if the measurements are swtiching between 
@@ -76,8 +75,8 @@ def magnetic_field_callback(magMsg):
 # Code adapted from:
 # https://github.com/SodaqMoja/Mitsuta/blob/master/mitsuta.py
 def mitsuta_mean(angles_array):
-    # Function meant to work with degress, covert inputs
-    # from radiants to degrees and output from degrees to radiants
+    # Function meant to work with degrees, covert inputs
+    # from radians to degrees and output from degrees to radians
     D = math.degrees(angles_array[0])
     mysum = D
     for val in angles_array[1:]:
@@ -105,7 +104,7 @@ def mitsuta_mean(angles_array):
 
 if __name__ == '__main__':
 
-    rospy.init_node('yaw_hummy_horizontal')
+    rospy.init_node('bearing_from_mag')
     rospy.loginfo(rospy.get_name() + " start")
     
     # Read Settings
@@ -150,7 +149,7 @@ if __name__ == '__main__':
         number_samples_average = rospy.get_param('~number_samples_average')
 
     num_magnetometer_reads = 0
-    array_yaw = np.zeros(shape = (number_samples_average,1)) 
+    array_bearings = np.zeros(shape = (number_samples_average, 1))
 
 
     # Debug
@@ -171,9 +170,9 @@ if __name__ == '__main__':
     rospy.Subscriber("magnetic_field", Vector3Stamped, magnetic_field_callback)
 
     # Publishers
-    pub_yaw_raw = rospy.Publisher(rospy.get_name() + '/yaw_raw', Float64, queue_size = 10)
-    pub_yaw_avg = rospy.Publisher(rospy.get_name() + '/yaw_avg', Float64, queue_size = 10)
-    pub_q_avg = rospy.Publisher(rospy.get_name() + '/q_avg', Quaternion, queue_size = 10)
+    pub_bearing_raw = rospy.Publisher(rospy.get_name() + '/bearing_raw', Float64, queue_size = 10)
+    pub_bearing_avg = rospy.Publisher(rospy.get_name() + '/bearing_avg', Float64, queue_size = 10)
+    pub_q_bearing_avg = rospy.Publisher(rospy.get_name() + '/q_bearing_avg', Quaternion, queue_size = 10)
 
     # Spin
     rospy.spin()
