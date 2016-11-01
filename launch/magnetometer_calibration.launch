@@ -1,0 +1,18 @@
+<launch>
+
+	<!-- Before launching this file remember to set ROS_MASTER_URI with ROS uri of the MAV you want to calibrate. 
+			 Script meant to be used mainly with Hummingbird MAVs.
+  -->
+  <arg name="raw_mag_topic" default="/hawk/fcu/mag"/>
+
+  <!-- Plotting, useful to look for max magnetic field in each axis -->
+  <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"
+      args="$(arg raw_mag_topic)/vector"
+      respawn="false" output="screen" />
+
+  <!-- Rosbag raw mag -->
+  <node pkg="rosbag" type="record" name="rosbag_record" respawn="true" output="screen"
+          args="-o $(find mbzirc_utils)/matlab/raw_magnetometer_bags/raw_mag
+                   $(arg raw_mag_topic)" />
+
+</launch>
