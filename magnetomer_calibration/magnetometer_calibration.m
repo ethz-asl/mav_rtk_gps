@@ -4,11 +4,25 @@
 % https://github.com/KristofRobot/razor_imu_9dof/blob/indigo-devel/magnetometer_calibration/Matlab/magnetometer_calibration/magnetometer_calibration.m
 %******************************************************************************************
 
-%% Todo manually for now: 
-%                           1. convert rosbag in csv and load it in Matlab
-%                           using GIU
-%                           2. run this script
+%% Load rosbag with raw magnetometer data
+% location of the rosbag
+folder_path = './raw_magnetometer_bags/2016-11-01/';
+bag_name = 'calibration_data.bag';
+topic_name = '/hawk/fcu/mag';
 
+file_path = fullfile([folder_path bag_name]);
+bag = rosbag(file_path);
+
+mag_selector = select(bag, 'Topic', topic_name);
+
+mag_ts = timeseries(mag_selector, ...
+                    'Vector.X', 'Vector.Y', 'Vector.Z');
+                
+x = mag_ts.Data(:,1);
+y = mag_ts.Data(:,2);
+z = mag_ts.Data(:,3);
+
+%% Calibration
 
 % do ellipsoid fitting
 [e_center, e_radii, e_eigenvecs, e_algebraic] = ellipsoid_fit([x, y, z]);
@@ -23,10 +37,11 @@ comp = invmap * scale * map;
 S = comp * S; % do compensation
 
 % output info
-fprintf('In the mbzirc_utils/?? of the MAV, add the following yaml parameters "\n');
-fprintf('Replace the existing 3 lines with these:\n\n');
-fprintf('magnetometer/offset: [%.6g, %.6g, %.6g]\n', e_center);
-fprintf('magnetometer/compensation: [%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g]\n', comp);
+fprintf('Add the following yaml parameters in launch files that starts mbzirc_init_rovio/scripts/bearing_from_mag.py\n');
+fprintf('--------------------------------------------------------------------\n\n');
+fprintf('<rosparam param="calibration_offset">[%.6g, %.6g, %.6g]</rosparam>\n', e_center);
+fprintf('<rosparam param="calibration_compensation">[%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g]</rosparam>\n', comp);
+fprintf('\n--------------------------------------------------------------------\n\n');
 
 %% Plot results
 % draw ellipsoid fit
