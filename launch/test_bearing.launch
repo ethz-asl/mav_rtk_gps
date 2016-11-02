@@ -5,16 +5,16 @@
 	<!-- Convert magnetic field to bearing angle, angle == 0 if X axis sensor points North -->
   <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
   	<!-- Calibration data -->
-    <rosparam param="magnetometer/offset">[352.57, 500.691, 36.0921]</rosparam>
-    <rosparam param="magnetometer/compensation">[0.946845, 0.00516968, 0.0143295, 0.00516968, 0.925902, 0.0132176, 0.0143295, 0.0132176, 0.993236]</rosparam>
+    <rosparam param="calibration_offset">[352.57, 500.691, 36.0921]</rosparam>
+    <rosparam param="calibration_compensation">[0.946845, 0.00516968, 0.0143295, 0.00516968, 0.925902, 0.0132176, 0.0143295, 0.0132176, 0.993236]</rosparam>
 
     <!-- Other data -->
-    <rosparam param="magnetometer/declination_deg">2</rosparam> <!-- 2 degrees, in rads -->
+    <rosparam param="declination_deg">2</rosparam>
 
-    <!-- WARNING: 45 degrees (due to hummingbird autopilot offset) -->
-    <rosparam param="magnetometer/constant_offset_deg">45</rosparam> 
+    <!-- Constant offset added to final bearing -->
+    <rosparam param="bearing_constant_offset_deg">0.0</rosparam> 
 
-    <rosparam param="print_debug">False</rosparam>
+    <rosparam param="print_debug">True</rosparam>
 
     <remap from="magnetic_field" to="$(arg magnetometer_topic)"/>
   </node>

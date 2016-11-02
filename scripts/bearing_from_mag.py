@@ -117,27 +117,27 @@ if __name__ == '__main__':
     
     # Read Settings
     # Magnetometer
-    if not rospy.has_param('~magnetometer/declination_deg'):
+    if not rospy.has_param('~declination_deg'):
         mag_declination = 0.0
     else:
-        mag_declination = math.radians(rospy.get_param('~magnetometer/declination_deg'))
+        mag_declination = math.radians(rospy.get_param('~declination_deg'))
 
-    if not rospy.has_param('~magnetometer/offset'):
+    if not rospy.has_param('~calibration_offset'):
         mag_offset = np.array([0.0, 0.0, 0.0])
     else:
-        mag_offset = np.array(rospy.get_param('~magnetometer/offset'))
+        mag_offset = np.array(rospy.get_param('~calibration_offset'))
         if mag_offset.size != 3:
-            rospy.logerr("param 'magnetometer/offset' must be an array with 3 elements.")
+            rospy.logerr("param 'calibration_offset' must be an array with 3 elements.")
             mag_offset = np.array([0.0, 0.0, 0.0])
 
-    if not rospy.has_param('~magnetometer/compensation'):
+    if not rospy.has_param('~calibration_compensation'):
         mag_compensation = np.array([0.0, 0.0, 0.0],
                                     [0.0, 0.0, 0.0],
                                     [0.0, 0.0, 0.0])
     else:
-        mag_compensation = np.array(rospy.get_param('~magnetometer/compensation'))
+        mag_compensation = np.array(rospy.get_param('~calibration_compensation'))
         if mag_compensation.size != 9:
-            rospy.logerr("param 'magnetometer/compensation' must be an array with 9 elements")
+            rospy.logerr("param 'calibration_compensation' must be an array with 9 elements")
             mag_compensation = np.array([0.0, 0.0, 0.0],
                                         [0.0, 0.0, 0.0],
                                         [0.0, 0.0, 0.0])
@@ -145,13 +145,13 @@ if __name__ == '__main__':
             # create matrix from array
             mag_compensation = mag_compensation.reshape(3,3)
 
-    if not rospy.has_param('~magnetometer/constant_offset_deg'):
+    if not rospy.has_param('~bearing_constant_offset_deg'):
         constant_offset = math.pi / 4
         #WARNING: Hummingbird version of the autopilot used to test this
         # script has a constant offset of 45 degrees added to the
         # magnetic field raw measurements (they're not so "raw" ...)
     else:
-        constant_offset = math.radians(rospy.get_param('~magnetometer/constant_offset_deg'))
+        constant_offset = math.radians(rospy.get_param('~bearing_constant_offset_deg'))
 
     # Other Settings
     if not rospy.has_param('~number_samples_average'):
