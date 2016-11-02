@@ -90,24 +90,23 @@ def mitsuta_mean(angles_array):
     for val in angles_array[1:]:
         val = math.degrees(val)
         delta = val - D
-        if delta < -180:
-            D = D + delta + 360
-        elif delta < 180:
+        if delta < -180.0:
+            D = D + delta + 360.0
+        elif delta < 180.0:
             D = D + delta
         else:
-            D = D + delta - 360
+            D = D + delta - 360.0
         mysum = mysum + D
     m = mysum / len(angles_array)
 
-    avg = math.radians((m + 360) % 360)
+    avg = math.radians((m + 360.0) % 360.0)
     # make sure avg is between -pi and pi
     if avg > math.pi:
-        avg = avg - 2 * math.pi
+        avg = avg - 2.0 * math.pi
     elif avg < -math.pi:
-        avg = avg + 2 * math.pi
+        avg = avg + 2.0 * math.pi
 
     return avg
-
 
 
 if __name__ == '__main__':
@@ -188,8 +187,10 @@ if __name__ == '__main__':
     rospy.Subscriber("magnetic_field", Vector3Stamped, magnetic_field_callback)
 
     # Publishers
-    pub_bearing_raw = rospy.Publisher(rospy.get_name() + '/bearing_raw', Float64, queue_size = 10)
-    pub_bearing_avg = rospy.Publisher(rospy.get_name() + '/bearing_avg', Float64, queue_size = 10)
+    pub_bearing_raw = rospy.Publisher(rospy.get_name() + '/bearing_raw', 
+                                      Float64, queue_size = 10)
+    pub_bearing_avg = rospy.Publisher(rospy.get_name() + '/bearing_avg', 
+                                      Float64, queue_size = 10)
     pub_imu_bearing_avg = rospy.Publisher(rospy.get_name() + '/imu_bearing_avg',
                                           Imu, queue_size = 10)
 
