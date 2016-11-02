@@ -12,8 +12,8 @@
     <!-- Other data -->
     <rosparam param="declination_deg">2</rosparam> 
 
-    <!-- WARNING: 45 degrees (due to hummingbird autopilot offset) + 90 degrees offset ENU North to sensor's X axis -->
-    <rosparam param="bearing_constant_offset_deg">135</rosparam> 
+    <!-- WARNING: + 90 degrees offset ENU North to sensor's X axis -->
+    <rosparam param="bearing_constant_offset_deg">90</rosparam> 
 
     <rosparam param="print_debug">False</rosparam>
 
