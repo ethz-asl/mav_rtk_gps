@@ -1,25 +1,30 @@
 <launch>
 
+	<arg name="magnetometer_topic" default="/hawk/fcu/mag" />
+
+	<!-- Convert magnetic field to bearing angle, angle == 0 if X axis sensor points North -->
   <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
   	<!-- Calibration data -->
     <rosparam param="magnetometer/offset">[352.57, 500.691, 36.0921]</rosparam>
     <rosparam param="magnetometer/compensation">[0.946845, 0.00516968, 0.0143295, 0.00516968, 0.925902, 0.0132176, 0.0143295, 0.0132176, 0.993236]</rosparam>
 
     <!-- Other data -->
-    <rosparam param="magnetometer/declination">0.0349065850398866</rosparam> <!-- 2 degrees, in rads -->
-    <rosparam param="magnetometer/constant_offset">0.785398163397448</rosparam> <!-- 45 degrees, in rads -->
+    <rosparam param="magnetometer/declination_deg">2</rosparam> <!-- 2 degrees, in rads -->
 
-    <rosparam param="print_debug">True</rosparam>
+    <!-- WARNING: 45 degrees (due to hummingbird autopilot offset) -->
+    <rosparam param="magnetometer/constant_offset_deg">45</rosparam> 
 
-    <remap from="magnetic_field" to="/hawk/fcu/mag"/>
+    <rosparam param="print_debug">False</rosparam>
+
+    <remap from="magnetic_field" to="$(arg magnetometer_topic)"/>
   </node>
 
   <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"
       args="bearing_from_mag/bearing_raw bearing_from_mag/bearing_avg"
       respawn="false" output="screen" />
 
-  <node name="rqt_plot_mag_corrected" pkg="rqt_plot" type="rqt_plot"
+  <!--node name="rqt_plot_mag_corrected" pkg="rqt_plot" type="rqt_plot"
       args="/bearing_from_mag/mag_corrected"
-      respawn="false" output="screen" />
+      respawn="false" output="screen" /-->
 
 </launch>

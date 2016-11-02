@@ -8,6 +8,7 @@
 import rospy
 import tf.transformations as tf
 from sensor_msgs.msg import Imu
+import math
 
 def yaw_to_imu(yaw):
 
@@ -33,10 +34,10 @@ if __name__ == '__main__':
     else:
         publishing_frequency = rospy.get_param('~publishing_frequency')
 
-    if not rospy.has_param('~constant_yaw'):
+    if not rospy.has_param('~constant_yaw_deg'):
         constant_yaw = 0.0
     else:
-        constant_yaw = rospy.get_param('~constant_yaw')
+        constant_yaw = math.radians(rospy.get_param('~constant_yaw_deg'))
 
     pub_imu = rospy.Publisher(rospy.get_name() + '/imu',
                               Imu, queue_size = 10)

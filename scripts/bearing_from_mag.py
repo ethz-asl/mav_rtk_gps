@@ -117,15 +117,10 @@ if __name__ == '__main__':
     
     # Read Settings
     # Magnetometer
-    if not rospy.has_param('~magnetometer/declination'):
-        declination = 0.0
-    else:
-        declination = rospy.get_param('~magnetometer/declination')
-
-    if not rospy.has_param('~magnetometer/declination'):
+    if not rospy.has_param('~magnetometer/declination_deg'):
         mag_declination = 0.0
     else:
-        mag_declination = rospy.get_param('~magnetometer/declination')
+        mag_declination = math.radians(rospy.get_param('~magnetometer/declination_deg'))
 
     if not rospy.has_param('~magnetometer/offset'):
         mag_offset = np.array([0.0, 0.0, 0.0])
@@ -150,13 +145,13 @@ if __name__ == '__main__':
             # create matrix from array
             mag_compensation = mag_compensation.reshape(3,3)
 
-    if not rospy.has_param('~magnetometer/constant_offset'):
+    if not rospy.has_param('~magnetometer/constant_offset_deg'):
         constant_offset = math.pi / 4
         #WARNING: Hummingbird version of the autopilot used to test this
         # script has a constant offset of 45 degrees added to the
         # magnetic field raw measurements (they're not so "raw" ...)
     else:
-        constant_offset = rospy.get_param('~magnetometer/constant_offset')
+        constant_offset = math.radians(rospy.get_param('~magnetometer/constant_offset_deg'))
 
     # Other Settings
     if not rospy.has_param('~number_samples_average'):
@@ -187,7 +182,7 @@ if __name__ == '__main__':
 
     rospy.logwarn(rospy.get_name() +
                   " declination: " +
-                  str(math.degrees(declination)) + " (deg)")
+                  str(math.degrees(mag_declination)) + " (deg)")
 
     # Subscribe to magnetometer topic
     rospy.Subscriber("magnetic_field", Vector3Stamped, magnetic_field_callback)
