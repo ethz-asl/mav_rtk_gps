@@ -63,7 +63,7 @@ def magnetic_field_callback(magMsg):
     pub_imu_bearing_avg.publish(imu_msg)
 
     # debug
-    if print_debug:
+    if verbose:
         rospy.loginfo("bearing_avg (deg): " +
                       str(math.degrees(bearing_avg)))
 
@@ -159,12 +159,12 @@ if __name__ == '__main__':
 
 
     # Debug
-    if not rospy.has_param('~print_debug'):
-        print_debug = False
+    if not rospy.has_param('~verbose'):
+        verbose = False
     else:
-        print_debug = rospy.get_param('~print_debug')
+        verbose = rospy.get_param('~verbose')
 
-    if print_debug:
+    if verbose:
         rospy.loginfo(rospy.get_name() +
                       " magnetometer offset: " + str(mag_offset))
         rospy.loginfo(rospy.get_name() +
@@ -190,12 +190,9 @@ if __name__ == '__main__':
     pub_imu_bearing_avg = rospy.Publisher(rospy.get_name() + '/imu_bearing_avg',
                                           Imu, queue_size = 10)
 
-    if print_debug:
+    if verbose:
         pub_mag_corrected = rospy.Publisher(rospy.get_name() + '/mag_corrected',
                                             Vector3Stamped, queue_size = 10)
 
     # Spin
     rospy.spin()
-
-
-

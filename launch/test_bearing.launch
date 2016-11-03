@@ -16,7 +16,7 @@
     <rosparam param="declination_deg">2</rosparam>
     <!-- Constant offset added to final bearing -->
     <rosparam param="bearing_constant_offset_deg">0.0</rosparam> 
-    <rosparam param="print_debug">True</rosparam>
+    <rosparam param="verbose">True</rosparam>
 
     <remap from="magnetic_field" to="$(arg magnetometer_topic)"/>
   </node>
