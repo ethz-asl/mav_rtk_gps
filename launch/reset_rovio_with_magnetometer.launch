@@ -6,8 +6,7 @@
   <!-- Convert magnetic field to yaw angle -->
   <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
     <!-- Calibration data -->
-    <rosparam param="calibration_offset">[352.57, 500.691, 36.0921]</rosparam>
-    <rosparam param="calibration_compensation">[0.946845, 0.00516968, 0.0143295, 0.00516968, 0.925902, 0.0132176, 0.0143295, 0.0132176, 0.993236]</rosparam>
+    <!-- REMEMBER to provide the calibration data for the magnetometer -->
 
     <!-- Other data -->
     <rosparam param="declination_deg">2</rosparam> 
@@ -22,7 +21,6 @@
   <node pkg="mbzirc_init_rovio" type="init_rovio_enu.py" name="init_rovio_enu" output="screen">
     <remap from="mag_imu" to="/bearing_from_mag/imu_bearing_avg" /> 
     <!-- REMEMBER to provide the calibration data from MAV IMU to VI-sensor IMU -->
-    <!--rosparam file="$(find mbzirc_t1_startup)/cfg/msf_parameters_vision_flourish.yaml"/ -->
   </node>
 
 </launch>
