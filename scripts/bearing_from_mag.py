@@ -144,10 +144,7 @@ if __name__ == '__main__':
             mag_compensation = mag_compensation.reshape(3,3)
 
     if not rospy.has_param('~bearing_constant_offset_deg'):
-        constant_offset = math.pi / 4
-        #WARNING: Hummingbird version of the autopilot used to test this
-        # script has a constant offset of 45 degrees added to the
-        # magnetic field raw measurements (they're not so "raw" ...)
+        constant_offset = 0.0
     else:
         constant_offset = math.radians(rospy.get_param('~bearing_constant_offset_deg'))
 

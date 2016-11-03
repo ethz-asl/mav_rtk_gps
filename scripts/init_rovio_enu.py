@@ -28,9 +28,9 @@ def mag_imu_callback(imuMsg):
             # Convert GPS TransformStamped to Pose, as requested from the service
             pose_msg = Pose()
 
-            pose_msg.position.x = 0
-            pose_msg.position.y = 0
-            pose_msg.position.z = 0
+            pose_msg.position.x = 0.0
+            pose_msg.position.y = 0.0
+            pose_msg.position.z = 0.0
 
             # orientation of the IMU frame of the MAV (body frame, or I frame according to MSF)
             qEnuI = [imuMsg.orientation.x, 

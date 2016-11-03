@@ -4,7 +4,7 @@
        1. Set ROS_MASTER_URI with ROS uri of the MAV you want to calibrate; 
        2. Set ROS_IP with IP of your machine.
        Script meant to be used mainly with Hummingbird MAVs. -->
-	<arg name="magnetometer_topic" default="/hawk/fcu/mag" />
+  <arg name="magnetometer_topic" default="/hawk/fcu/mag" />
 
 	<!-- Convert magnetic field to bearing angle, angle == 0 if X axis of sensor points North -->
   <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
