@@ -13,6 +13,7 @@
     <remap from="mag_imu" to="/constant_yaw_to_imu/imu" /> 
     <!-- REMEMBER to provide the calibration data from MAV IMU to VI-sensor IMU -->
     <!--rosparam file="$(find mbzirc_t1_startup)/cfg/msf_parameters_vision_flourish.yaml"/ -->
+    <param name="samples_before_reset" value="5" />
   </node>
 
 </launch>

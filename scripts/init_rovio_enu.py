@@ -38,7 +38,8 @@ def mag_imu_callback(imuMsg):
                      imuMsg.orientation.z, 
                      imuMsg.orientation.w]
 
-            # compute pose from local ENU (East-North-Up frame) to IMU frame of the MAV (== body frame or C frame, according to MSF)
+            # compute pose from local ENU (East-North-Up frame) to 
+            # IMU frame of the MAV (== body frame or C frame, according to MSF)
             qEnuC = tf.quaternion_multiply(qEnuI, qIC)
             pose_msg.orientation.w = qEnuC[3]
             pose_msg.orientation.x = qEnuC[0]
@@ -73,14 +74,17 @@ if __name__ == '__main__':
     else:
         samples_before_reset = rospy.get_param('~samples_before_reset')
 
-    if not rospy.has_param('~pose_sensor/init/q_ic/x') and not rospy.has_param('~pose_sensor/init/q_ic/y')\
-       and not rospy.has_param('~pose_sensor/init/q_ic/z') and not rospy.has_param('~pose_sensor/init/q_ic/w'):
+    if not rospy.has_param('~pose_sensor/init/q_ic/x') \
+       and not rospy.has_param('~pose_sensor/init/q_ic/y') \
+       and not rospy.has_param('~pose_sensor/init/q_ic/z') \
+       and not rospy.has_param('~pose_sensor/init/q_ic/w'):
         qIC_w = 1.0
         qIC_x = 0.0
         qIC_y = 0.0
         qIC_z = 0.0
         # warn user about missing transformation between vi-sensor IMU frame (C) and MAV IMU frame (I)
-        rospy.logwarn(rospy.get_name() + ": missing transformation from vi-sensor IMU and MAV IMU. Using identity quaternion for now")
+        rospy.logwarn(rospy.get_name() + 
+            ": missing transformation from vi-sensor IMU and MAV IMU. Using identity quaternion.")
     else:
         # this is the orientation of the vi-sensor IMU frame (C) with respect to MAV IMU frame (I)
         qIC_w = rospy.get_param('~pose_sensor/init/q_ic/w')

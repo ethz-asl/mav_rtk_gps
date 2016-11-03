@@ -30,7 +30,7 @@ if __name__ == '__main__':
     
     # Read Settings
     if not rospy.has_param('~publishing_frequency'):
-        publishing_frequency = 10.0
+        publishing_frequency = 2.0
     else:
         publishing_frequency = rospy.get_param('~publishing_frequency')
 
@@ -46,6 +46,3 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         yaw_to_imu(constant_yaw)
         rate.sleep()
-
-
-

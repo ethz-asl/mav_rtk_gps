@@ -1,8 +1,9 @@
 <launch>
 
-	<!-- Before launching this file remember to set ROS_MASTER_URI with ROS uri of the MAV you want to calibrate. 
-			 Script meant to be used mainly with Hummingbird MAVs.
-  -->
+  <!-- Before launching this file remember to,
+       1. Set ROS_MASTER_URI with ROS uri of the MAV you want to calibrate; 
+       2. Set ROS_IP with IP of your machine.
+       Script meant to be used mainly with Hummingbird MAVs. -->
   <arg name="raw_mag_topic" default="/hawk/fcu/mag"/>
 
   <!-- Plotting, useful to look for max magnetic field in each axis -->

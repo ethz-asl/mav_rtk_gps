@@ -4,7 +4,6 @@
 #  Title:        bearing_from_mag.py
 #  Description:  ROS module to calculate bearing angle from magnetometer data, when the MAV is placed
 #                horizontally, i.e. WITH pitch == roll == 0 (or at leaset very small).
-#                If the X axis of the sensor is aligned North, then bearing is zero.
 #
 
 import rospy
