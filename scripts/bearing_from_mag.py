@@ -129,16 +129,16 @@ if __name__ == '__main__':
             mag_offset = np.array([0.0, 0.0, 0.0])
 
     if not rospy.has_param('~calibration_compensation'):
-        mag_compensation = np.array([0.0, 0.0, 0.0],
-                                    [0.0, 0.0, 0.0],
-                                    [0.0, 0.0, 0.0])
+        mag_compensation = np.array([1.0, 0.0, 0.0],
+                                    [0.0, 1.0, 0.0],
+                                    [0.0, 0.0, 1.0])
     else:
         mag_compensation = np.array(rospy.get_param('~calibration_compensation'))
         if mag_compensation.size != 9:
             rospy.logerr("param 'calibration_compensation' must be an array with 9 elements")
-            mag_compensation = np.array([0.0, 0.0, 0.0],
-                                        [0.0, 0.0, 0.0],
-                                        [0.0, 0.0, 0.0])
+            mag_compensation = np.array([1.0, 0.0, 0.0],
+                                        [0.0, 1.0, 0.0],
+                                        [0.0, 0.0, 1.0])
         else:
             # create matrix from array
             mag_compensation = mag_compensation.reshape(3,3)
