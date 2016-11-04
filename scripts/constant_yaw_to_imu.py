@@ -22,7 +22,6 @@ def yaw_to_imu(yaw):
 
     pub_imu.publish(imu_msg)
 
-
 if __name__ == '__main__':
 
     rospy.init_node('constant_yaw_to_imu')
