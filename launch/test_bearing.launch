@@ -24,6 +24,5 @@
   <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"
       args="bearing_from_mag/bearing_raw_deg bearing_from_mag/bearing_avg_deg"
       respawn="false" output="screen" />
-  </node>
 
 </launch>
