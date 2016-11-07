@@ -37,10 +37,11 @@ comp = invmap * scale * map;
 S = comp * S; % do compensation
 
 % output info
-fprintf('Add the following yaml parameters in launch files that starts mbzirc_init_rovio/scripts/bearing_from_mag.py\n');
+fprintf('Copy the following yaml parameters in mav_startup/parameters/mavs/mavs/hawk_mbzirc/magnetometer_calibration.yaml \n');
 fprintf('--------------------------------------------------------------------\n\n');
-fprintf('<rosparam param="calibration_offset">[%.6g, %.6g, %.6g]</rosparam>\n', e_center);
-fprintf('<rosparam param="calibration_compensation">[%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g]</rosparam>\n', comp);
+fprintf('calibration_offset: [%.6g, %.6g, %.6g]\n', e_center);
+fprintf('calibration_compensation: [%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g]\n', comp);
+fprintf('declination: %.6g \n', 2.0); % OK for Zuerich
 fprintf('\n--------------------------------------------------------------------\n\n');
 
 %% Plot results
