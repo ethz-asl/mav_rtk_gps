@@ -2,7 +2,7 @@
 
 #
 #  Title:        constant_yaw_to_imu.py
-#  Description:  ROS module to publish imu message built from a constant yaw angle.
+#  Description:  ROS module to publish imu messages built from a constant yaw angle.
 #
 
 import rospy
@@ -28,15 +28,8 @@ if __name__ == '__main__':
     rospy.loginfo(rospy.get_name() + " start")
     
     # Read Settings
-    if not rospy.has_param('~publishing_frequency'):
-        publishing_frequency = 2.0
-    else:
-        publishing_frequency = rospy.get_param('~publishing_frequency')
-
-    if not rospy.has_param('~constant_yaw_deg'):
-        constant_yaw = 0.0
-    else:
-        constant_yaw = math.radians(rospy.get_param('~constant_yaw_deg'))
+    publishing_frequency = rospy.get_param('~publishing_frequency', 2.0)
+    constant_yaw = math.radians(rospy.get_param('~constant_yaw_deg', 0.0))
 
     pub_imu = rospy.Publisher(rospy.get_name() + '/imu',
                               Imu, queue_size = 10)
