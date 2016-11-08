@@ -39,7 +39,6 @@ class BearingFromMag():
             self._pub_mag_corrected = rospy.Publisher(rospy.get_name() + '/mag_corrected',
                                                       Vector3Stamped, queue_size = 10)
 
-        # Spin
         rospy.spin()
 
     def read_settings(self):
@@ -83,12 +82,12 @@ class BearingFromMag():
                           " number of samples to average: " +
                           str(self._number_samples_average))
 
-    def magnetic_field_callback(self, magMsg):
+    def magnetic_field_callback(self, magnetometer_msg):
 
         # Correct magnetic filed
-        raw_mag = np.array([magMsg.vector.x,
-                            magMsg.vector.y,
-                            magMsg.vector.z])
+        raw_mag = np.array([magnetometer_msg.vector.x,
+                            magnetometer_msg.vector.y,
+                            magnetometer_msg.vector.z])
 
         # corrected_mag = compensation * (raw_mag - offset)
         corrected_mag = np.dot(self._calibration_compensation,
@@ -137,7 +136,7 @@ class BearingFromMag():
             rospy.loginfo("bearing_avg : " +
                           str(math.degrees(bearing_avg)) + " deg")
 
-            mag_corrected_msg = magMsg
+            mag_corrected_msg = magnetometer_msg
             mag_corrected_msg.vector.x = corrected_mag[0]
             mag_corrected_msg.vector.y = corrected_mag[1]
             mag_corrected_msg.vector.z = corrected_mag[2]
@@ -146,7 +145,8 @@ class BearingFromMag():
     def angular_mean(self, angles_array):
         #  choose one of the following
         return self.atan2_mean(angles_array)
-        #return self.mitsuta_mean(angles_array)
+        #TODO (marco-tranzatto) remove once above has been tested
+        #return self.mitsuta_mean(angles_array) 
 
     # From Wikipedia:
     # https://en.wikipedia.org/wiki/Mean_of_circular_quantities

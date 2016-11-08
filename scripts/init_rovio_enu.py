@@ -29,7 +29,7 @@ class InitRovioEnu:
         self._qIC = [qIC_x, qIC_y, qIC_z, qIC_w]
 
         if self._verbose:
-            rospy.logwarn(rospy.get_name() +
+            rospy.loginfo(rospy.get_name() +
                           ": transformation from vi-sensor IMU and MAV IMU [x, y, z, w]: " + str(self._qIC))
 
         # Init other variables
@@ -39,10 +39,9 @@ class InitRovioEnu:
         # Subscribe to Imu topic which contains the yaw orientation
         rospy.Subscriber("mag_imu", Imu, self.mag_imu_callback)
 
-        # Spin
         rospy.spin()
 
-    def mag_imu_callback(self, imuMsg):
+    def mag_imu_callback(self, imu_msg):
 
         self._num_external_pose_read += 1
 
@@ -59,10 +58,10 @@ class InitRovioEnu:
                 pose_msg.position.z = 0.0
 
                 # orientation of the IMU frame of the MAV (body frame, or I frame according to MSF)
-                qEnuI = [imuMsg.orientation.x,
-                         imuMsg.orientation.y,
-                         imuMsg.orientation.z,
-                         imuMsg.orientation.w]
+                qEnuI = [imu_msg.orientation.x,
+                         imu_msg.orientation.y,
+                         imu_msg.orientation.z,
+                         imu_msg.orientation.w]
 
                 # compute pose from local ENU (East-North-Up frame) to
                 # IMU frame of the MAV (== body frame or C frame, according to MSF)
@@ -72,14 +71,14 @@ class InitRovioEnu:
                 pose_msg.orientation.y = qEnuC[1]
                 pose_msg.orientation.z = qEnuC[2]
 
-                resp = rovio_reset_srv(pose_msg)
+                response = rovio_reset_srv(pose_msg)
                 self._resent_to_send = False
                 rospy.loginfo(rospy.get_name() + ": sent reset to ROVIO")
 
                 qEnuI_euler = tf.euler_from_quaternion(qEnuI)
                 # print orientation to initialize rovio, this information
                 # should always be double checked with manual measurements
-                rospy.logwarn(rospy.get_name() + ": body frame of MAV assumed with " +
+                rospy.loginfo(rospy.get_name() + ": body frame of MAV assumed with " +
                               str(math.degrees(qEnuI_euler[0])) + " (deg) roll, " +
                               str(math.degrees(qEnuI_euler[1])) + " (deg) pitch, " +
                               str(math.degrees(qEnuI_euler[2])) + " (deg) yaw from local ENU")

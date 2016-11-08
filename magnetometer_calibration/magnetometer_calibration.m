@@ -8,7 +8,8 @@
 % location of the rosbag
 folder_path = './raw_magnetometer_bags/2016-11-01/';
 bag_name = 'calibration_data.bag';
-topic_name = '/hawk/fcu/mag';
+mav_name = 'hawk';
+topic_name = ['/' mav_name '/fcu/mag'];
 
 file_path = fullfile([folder_path bag_name]);
 bag = rosbag(file_path);
