@@ -8,7 +8,7 @@
   <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
 
     <!-- Calibration data -->
-    <rosparam file="$(find mav_startup)/parameters/mavs/$(arg mav_name)_mbzirc/magnetometer_calibration.yaml"/>
+    <rosparam file="$(find mav_startup)/parameters/mavs/$(arg mav_name)/magnetometer_calibration.yaml"/>
 
     <!-- WARNING: + 90 degrees offset ENU North to sensor's X axis -->
     <param name="bearing_constant_offset_deg" value="90.0"/> 
