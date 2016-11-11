@@ -10,9 +10,9 @@
   <arg name="mav_name" default="hawk"/>
   <arg name="magnetometer_topic" default="/$(arg mav_name)/fcu/mag"/>
 
-	<!-- Convert magnetic field to bearing angle, angle == 0 if X axis of sensor points North -->
+  <!-- Convert magnetic field to bearing angle, angle == 0 if X axis of sensor points North -->
   <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
-  	<!-- Calibration data -->
+    <!-- Calibration data -->
     <rosparam file="$(find mav_startup)/parameters/mavs/$(arg mav_name)/magnetometer_calibration.yaml"/>
 
     <!-- Debugging variables -->
