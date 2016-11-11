@@ -3,6 +3,9 @@
   <!-- Before launching this file remember to,
        1. Set ROS_MASTER_URI with ROS uri of the MAV you want to calibrate; 
        2. Set ROS_IP with IP of your machine.
+       OR 
+       1. roscd mav_startup/scripts/
+       2. source configure_ros_network.sh.sh <IP_ROS_MASTER>
        Script meant to be used mainly with Hummingbird MAVs. -->
   <arg name="raw_mag_topic" default="/hawk/fcu/mag"/>
 
