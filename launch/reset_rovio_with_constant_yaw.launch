@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 
   <!-- This is an example about how ROVIO can be reset using a constant yaw angle, set as param in this launch file -->
