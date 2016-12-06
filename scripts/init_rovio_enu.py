@@ -75,13 +75,19 @@ class InitRovioEnu:
                 self._resent_to_send = False
                 rospy.loginfo(rospy.get_name() + ": sent reset to ROVIO")
 
-                qEnuI_euler = tf.euler_from_quaternion(qEnuI)
                 # print orientation to initialize rovio, this information
                 # should always be double checked with manual measurements
+                qEnuI_euler = tf.euler_from_quaternion(qEnuI, 'rzyx')
                 rospy.loginfo(rospy.get_name() + ": body frame of MAV assumed with " +
                               str(math.degrees(qEnuI_euler[0])) + " (deg) roll, " +
                               str(math.degrees(qEnuI_euler[1])) + " (deg) pitch, " +
-                              str(math.degrees(qEnuI_euler[2])) + " (deg) yaw from local ENU")
+                              str(math.degrees(qEnuI_euler[2])) + " (deg) yaw from local ENU (local axis, ZYX)")
+
+                qEnuC_euler = tf.euler_from_quaternion(qEnuC, 'rzyx')
+                rospy.loginfo(rospy.get_name() + ": camera IMU assumed " +
+                              str(math.degrees(qEnuC_euler[0])) + " (deg) roll, " +
+                              str(math.degrees(qEnuC_euler[1])) + " (deg) pitch, " +
+                              str(math.degrees(qEnuC_euler[2])) + " (deg) yaw from local ENU (local axis, ZYX)")
 
             except rospy.ServiceException, e:
                 print "Service call to reset rovio internal state failed: %s"%e
