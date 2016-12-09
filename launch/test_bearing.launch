@@ -1,22 +1,24 @@
+<?xml version="1.0"?>
 <launch>
 
   <!-- Before launching this file remember to,
        1. Set ROS_MASTER_URI with ROS uri of the MAV you want to calibrate; 
        2. Set ROS_IP with IP of your machine.
+       OR 
+       1. roscd mav_startup/scripts/
+       2. source configure_ros_network.sh.sh <IP_ROS_MASTER>
        Script meant to be used mainly with Hummingbird MAVs. -->
-  <arg name="magnetometer_topic" default="/hawk/fcu/mag" />
+  <arg name="mav_name" default="hawk"/>
+  <arg name="magnetometer_topic" default="/$(arg mav_name)/fcu/mag"/>
 
-	<!-- Convert magnetic field to bearing angle, angle == 0 if X axis of sensor points North -->
+  <!-- Convert magnetic field to bearing angle, angle == 0 if X axis of sensor points North -->
   <node pkg="mbzirc_init_rovio" type="bearing_from_mag.py" name="bearing_from_mag" output="screen">
-  	<!-- Calibration data -->
-    <rosparam param="calibration_offset">[352.57, 500.691, 36.0921]</rosparam>
-    <rosparam param="calibration_compensation">[0.946845, 0.00516968, 0.0143295, 0.00516968, 0.925902, 0.0132176, 0.0143295, 0.0132176, 0.993236]</rosparam>
+    <!-- Calibration data -->
+    <rosparam file="$(find mav_startup)/parameters/mavs/$(arg mav_name)/magnetometer_calibration.yaml"/>
 
-    <!-- Other data -->
-    <rosparam param="declination_deg">2</rosparam>
-    <!-- Constant offset added to final bearing -->
-    <rosparam param="bearing_constant_offset_deg">0.0</rosparam> 
-    <rosparam param="verbose">True</rosparam>
+    <!-- Debugging variables -->
+    <param name="bearing_constant_offset_deg" value="0.0" /> 
+    <param name="verbose" value="True" /> 
 
     <remap from="magnetic_field" to="$(arg magnetometer_topic)"/>
   </node>

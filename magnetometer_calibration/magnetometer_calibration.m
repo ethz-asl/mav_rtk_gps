@@ -6,8 +6,10 @@
 
 %% Load rosbag with raw magnetometer data
 % location of the rosbag
-folder_path = './raw_magnetometer_bags/2016-11-01/';
-bag_name = 'calibration_data.bag';
+% folder_path = './raw_magnetometer_bags/2016-11-01/';
+% bag_name = 'calibration_data.bag';
+folder_path = './raw_magnetometer_bags/2016-12-08/';
+bag_name = 'calib_data_2016-12-08-10-59-17.bag';
 mav_name = 'hawk';
 topic_name = ['/' mav_name '/fcu/mag'];
 
@@ -38,11 +40,13 @@ comp = invmap * scale * map;
 S = comp * S; % do compensation
 
 % output info
-fprintf('Add the following yaml parameters in launch files that starts mbzirc_init_rovio/scripts/bearing_from_mag.py\n');
-fprintf('--------------------------------------------------------------------\n\n');
-fprintf('<rosparam param="calibration_offset">[%.6g, %.6g, %.6g]</rosparam>\n', e_center);
-fprintf('<rosparam param="calibration_compensation">[%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g]</rosparam>\n', comp);
-fprintf('\n--------------------------------------------------------------------\n\n');
+fileID = fopen('magnetometer_calibration.yaml','w');
+fprintf(fileID, 'calibration_offset: [%.6g, %.6g, %.6g]\n', e_center);
+fprintf(fileID, 'calibration_compensation: [%.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g, %.6g]\n', comp);
+fprintf(fileID, 'declination: %.6g \n', 2.0); % OK for Zuerich
+fclose(fileID);
+fprintf('\n ********** Execute following command from command line: \n\n');
+fprintf('\n scp ./magnetometer_calibration.yaml mbzirc@10.10.50.10:/home/mbzirc/catkin_ws/src/mav_tools/mav_startup/parameters/mavs/hawk/magnetometer_calibration.yaml \n\n');
 
 %% Plot results
 % draw ellipsoid fit

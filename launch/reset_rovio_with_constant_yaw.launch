@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 
   <!-- This is an example about how ROVIO can be reset using a constant yaw angle, set as param in this launch file -->
@@ -11,8 +12,9 @@
   <!-- Initialize ROVIO using the imu message built using constant_yaw -->
   <node pkg="mbzirc_init_rovio" type="init_rovio_enu.py" name="init_rovio_enu" output="screen">
     <remap from="mag_imu" to="/constant_yaw_to_imu/imu" /> 
-    <!-- REMEMBER to provide the calibration data from MAV IMU to VI-sensor IMU -->
-    <!--rosparam file="$(find mbzirc_t1_startup)/cfg/msf_parameters_vision_flourish.yaml"/ -->
+    <!-- Calibration data from MAV IMU to VI-sensor IMU -->
+    <rosparam file="$(find mav_startup)/parameters/mavs/$(arg mav_name)/msf_parameters_vision.yaml"/>
+
     <param name="samples_before_reset" value="5" />
   </node>
   
