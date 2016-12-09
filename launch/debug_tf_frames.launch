@@ -1,25 +1,24 @@
 <?xml version="1.0"?>
 <launch>
-	<!-- enu is the main frame here! -->
+  <!-- enu is the main frame here! -->
 
   <!-- 	
     arg, option 1:  x y z qx qy qz qw frame_id child_frame_id  period_in_ms 
-		arg, option 2:  x y z yaw pitch roll frame_id child_frame_id period_in_ms 
-	-->
-
-	<node name="enu_to_sensor_imu_rovio_boadcaster" pkg="tf" type="static_transform_publisher"                     
-				args="0.0000 0.0000 0.0000 
+    arg, option 2:  x y z yaw pitch roll frame_id child_frame_id period_in_ms 
+  -->
+  <node name="enu_to_sensor_imu_rovio_boadcaster" pkg="tf" type="static_transform_publisher"
+        args="0.0000 0.0000 0.0000 
               0.217139 0.801404 -0.539795 -0.138649 
-							 enu sensor_imu_rovio 100" />
+              enu sensor_imu_rovio 100" />
 
-	<node name="enu_to_mav_imu_boadcaster" pkg="tf" type="static_transform_publisher"                     
-				args="0.0000 0.0000 0.0000
+  <node name="enu_to_mav_imu_boadcaster" pkg="tf" type="static_transform_publisher"
+        args="0.0000 0.0000 0.0000
               0.000000 0.000000 -0.866025 0.500000 
-							enu mav_imu 100" />
+              enu mav_imu 100" />
 
-	<node name="mav_imu_to_sensor_imu_check_boadcaster" pkg="tf" type="static_transform_publisher"                     
-			  args="0.1205 -0.0054 -0.1091
-              -0.585466 0.588750 -0.389971 0.398152 
-              mav_imu sensor_imu_check 100" />
+  <node name="mav_imu_to_sensor_imu_check_boadcaster" pkg="tf" type="static_transform_publisher"
+        args="0.1205 -0.0054 -0.1091
+        -0.585466 0.588750 -0.389971 0.398152 
+        mav_imu sensor_imu_check 100" />
 
 </launch>
