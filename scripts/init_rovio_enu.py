@@ -32,19 +32,25 @@ class InitRovioEnu:
     q_I_C_x = rospy.get_param('~pose_sensor/init/q_ic/x', 0.0)
     q_I_C_y = rospy.get_param('~pose_sensor/init/q_ic/y', 0.0)
     q_I_C_z = rospy.get_param('~pose_sensor/init/q_ic/z', 0.0)
-    self._q_I_C = [q_I_C_x, q_I_C_y, q_I_C_z, q_I_C_w]
+    q_I_C = [q_I_C_x, q_I_C_y, q_I_C_z, q_I_C_w]
 
     # position of IMU of the camera-sensor (C frame) from IMU of the MAV (I frame)
     # yes, it's the other way around respect the quaternion ...
     I_p_I_C_x = rospy.get_param('~pose_sensor/init/p_ic/x', 0.0)
     I_p_I_C_y = rospy.get_param('~pose_sensor/init/p_ic/y', 0.0)
     I_p_I_C_z = rospy.get_param('~pose_sensor/init/p_ic/z', 0.0)
-    self._I_p_I_C = [I_p_I_C_x, I_p_I_C_y, I_p_I_C_z]
+    I_p_I_C = [I_p_I_C_x, I_p_I_C_y, I_p_I_C_z]
+
+    # full transformation from MAV IMU (I) to sensor IMU (C)
+    rotation = tf.quaternion_matrix(q_I_C)
+    translation = tf.translation_matrix(I_p_I_C)
+    # do first translation and then rotation!
+    self._T_I_C = tf.concatenate_matrices(translation, rotation)
 
     if self._verbose:
         rospy.loginfo(rospy.get_name() +
                       ": transformation from vi-sensor IMU and MAV IMU [x, y, z, w]: " +
-                      str(self._q_I_C))
+                      str(q_I_C))
 
         if self._send_reset_automatically:
             rospy.loginfo(rospy.get_name() +
@@ -57,8 +63,8 @@ class InitRovioEnu:
     # init other variables
     self._num_imu_msgs_read = 0
     self._automatic_rovio_reset_sent_once = False
-    self._q_Enu_I = [0.0, 0.0, 0.0, 1.0]
     self._pose_world_imu_msg = Pose()
+    self._T_Enu_I = tf.identity_matrix()
 
     # advertise service
     self._reset_rovio_srv_server = rospy.Service(rospy.get_name() +
@@ -76,10 +82,19 @@ class InitRovioEnu:
 
     # compute new pose to use when resetting ROVIO
     # orientation of the IMU frame of the MAV (body frame, or I frame according to MSF)
-    self._q_Enu_I = [imu_msg.orientation.x,
-                     imu_msg.orientation.y,
-                     imu_msg.orientation.z,
-                     imu_msg.orientation.w]
+    q_Enu_I = [imu_msg.orientation.x,
+               imu_msg.orientation.y,
+               imu_msg.orientation.z,
+               imu_msg.orientation.w]
+    rotation = tf.quaternion_matrix(q_Enu_I)
+
+    # TODO (marco-tranzatto) check this for Challenge 3, for now assume ENU and
+    # Rovio world have same origin
+    translation = tf.translation_matrix([0.0, 0.0, 0.0])
+
+    # full transformation from MAV IMU (I) to local ENU (East-North-Up) frame
+    # do first translation and then rotation!
+    self._T_Enu_I = tf.concatenate_matrices(translation, rotation)
 
     if  self._send_reset_automatically and not self._automatic_rovio_reset_sent_once and \
         self._num_imu_msgs_read > self._samples_before_reset:
@@ -119,20 +134,14 @@ class InitRovioEnu:
 
         # compute pose from local ENU (East-North-Up frame) to
         # IMU frame of the MAV (== body frame or C frame, according to MSF)
-        q_Enu_C = tf.quaternion_multiply(self._q_Enu_I, self._q_I_C)
+        T_Enu_C = tf.concatenate_matrices(self._T_Enu_I, self._T_I_C)
+        q_Enu_C = tf.quaternion_from_matrix(T_Enu_C)
 
-        # set new Sensor IMU position and orientation respect to World frame 
+        # set new Sensor IMU position and orientation respect to World frame
         # (which is now aligned to local ENU)
-        # World and ENU AND MAV IMU are assumed to have
-        # the same origin (for now) and same orientation, so W == Enu
-        # I_p_EnuC == I_p_IC, then Enu_p_Enu_C = Enu_p_IC = R(q_EnuI) * I_p_IC
-        # TODO (marco-tranzatto) check this for CH. 3!
-        T_Enu_I = tf.quaternion_matrix(self._q_Enu_I)
-        R_Enu_I = T_Enu_I[:3, :3]
-        Enu_p_Enu_C = R_Enu_I.dot(self._I_p_I_C)
-        self._pose_world_imu_msg.position.x = Enu_p_Enu_C[0]
-        self._pose_world_imu_msg.position.y = Enu_p_Enu_C[1]
-        self._pose_world_imu_msg.position.z = Enu_p_Enu_C[2]
+        self._pose_world_imu_msg.position.x = T_Enu_C[0, 3]
+        self._pose_world_imu_msg.position.y = T_Enu_C[1, 3]
+        self._pose_world_imu_msg.position.z = T_Enu_C[2, 3]
         self._pose_world_imu_msg.orientation.w = q_Enu_C[3]
         self._pose_world_imu_msg.orientation.x = q_Enu_C[0]
         self._pose_world_imu_msg.orientation.y = q_Enu_C[1]
@@ -141,7 +150,8 @@ class InitRovioEnu:
         rovio_reset_srv(self._pose_world_imu_msg)
 
         if self._verbose:
-          (yaw, pitch, roll) = tf.euler_from_quaternion(self._q_Enu_I, 'rzyx')
+          q_Enu_I = tf.quaternion_from_matrix(self._T_Enu_I)
+          (yaw, pitch, roll) = tf.euler_from_quaternion(q_Enu_I, 'rzyx')
           rospy.loginfo(rospy.get_name() + ": body frame of MAV assumed with " +
             str(math.degrees(roll)) + " (deg) roll, " +
             str(math.degrees(pitch)) + " (deg) pitch, " +
@@ -169,8 +179,7 @@ class InitRovioEnu:
     file_obj.write("<?xml version=\"1.0\"?> \n")
     file_obj.write("<launch> \n \n")
     # final pose of Sensor IMU used to reset Rovio
-    # rovio_world == ENU TODO check me for CH.3 (marco-tranzatto)
-    self.create_tf_debug_node("enu", "sensor_imu_rovio", 
+    self.create_tf_debug_node("ENU", "sensor_imu_rovio",
                               self._pose_world_imu_msg.position.x,
                               self._pose_world_imu_msg.position.y,
                               self._pose_world_imu_msg.position.z,
@@ -180,26 +189,28 @@ class InitRovioEnu:
                               self._pose_world_imu_msg.orientation.w,
                               file_obj)
 
-    self.create_tf_debug_node("enu", "mav_imu",
-                              0.0,  # TODO check me for CH.3 (marco-tranzatto)
-                              0.0,  # TODO check me for CH.3 (marco-tranzatto)
-                              0.0,  # TODO check me for CH.3 (marco-tranzatto)
-                              self._q_Enu_I[0],
-                              self._q_Enu_I[1],
-                              self._q_Enu_I[2],
-                              self._q_Enu_I[3],
+    q_Enu_I = tf.quaternion_from_matrix(self._T_Enu_I)
+    self.create_tf_debug_node("ENU", "mav_imu",
+                              self._T_Enu_I[0, 3],
+                              self._T_Enu_I[1, 3],
+                              self._T_Enu_I[2, 3],
+                              q_Enu_I[0],
+                              q_Enu_I[1],
+                              q_Enu_I[2],
+                              q_Enu_I[3],
                               file_obj)
 
     # following tf should overlap with enu_to_sensor_imu
     # full Sensor IMU posed form msf_parameters_vision
+    q_I_C = tf.quaternion_from_matrix(self._T_I_C)
     self.create_tf_debug_node("mav_imu", "sensor_imu_check",
-                              self._I_p_I_C[0],
-                              self._I_p_I_C[1],
-                              self._I_p_I_C[2],
-                              self._q_I_C[0],
-                              self._q_I_C[1],
-                              self._q_I_C[2],
-                              self._q_I_C[3],
+                              self._T_I_C[0, 3],
+                              self._T_I_C[1, 3],
+                              self._T_I_C[2, 3],
+                              q_I_C[0],
+                              q_I_C[1],
+                              q_I_C[2],
+                              q_I_C[3],
                               file_obj)
     
     file_obj.write("\n</launch> \n\n")
