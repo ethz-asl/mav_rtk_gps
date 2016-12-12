@@ -16,6 +16,7 @@ from geometry_msgs.msg import TransformStamped, Pose
 from sensor_msgs.msg import Imu
 from rovio.srv import SrvResetToPose
 import math
+import os
 
 class InitRovioEnu:
 
@@ -122,57 +123,76 @@ class InitRovioEnu:
         rospy.loginfo(rospy.get_name() + ": sent reset to Rovio")
 
         if self._verbose:
-            self.print_rovio_init_info()
+          (yaw, pitch, roll) = tf.euler_from_quaternion(self._q_EnuI, 'rzyx')
+          rospy.loginfo(rospy.get_name() + ": body frame of MAV assumed with " +
+            str(math.degrees(roll)) + " (deg) roll, " +
+            str(math.degrees(pitch)) + " (deg) pitch, " +
+            str(math.degrees(yaw)) + " (deg) yaw from local ENU (local axis, ZYX)")
+
+
+        self.create_rovio_init_info()
 
     except rospy.ServiceException, e:
         print "Service call to reset rovio internal state failed: %s"%e
 
-  def print_rovio_init_info(self):
-    (yaw, pitch, roll) = tf.euler_from_quaternion(self._q_EnuI, 'rzyx')
-    rospy.loginfo(rospy.get_name() + ": body frame of MAV assumed with " +
-                  str(math.degrees(roll)) + " (deg) roll, " +
-                  str(math.degrees(pitch)) + " (deg) pitch, " +
-                  str(math.degrees(yaw)) + " (deg) yaw from local ENU (local axis, ZYX)")
-
-    rospy.loginfo("------------ Debugging info for Rviz ------------")
+  def create_rovio_init_info(self):
+    # Debugging file for Rviz
+    # current path of init_rovio_enu.py file
+    script_path = os.path.dirname(os.path.realpath(sys.argv[0]))
+    # write debug tf launch file in parent launch folder of parent directory
+    desired_path = "%s/../launch/debug_tf_frames.launch" % (script_path)
+    file_obj = open(desired_path, 'w')
+    file_obj.write("<?xml version=\"1.0\"?> \n")
+    file_obj.write("<launch> \n \n")
     # final pose of Sensor IMU used to reset Rovio
-    self.print_tf_debug_node("enu", "sensor_imu_rovio", # rovio_world == ENU
-                             self._pose_world_imu_msg.position.x,
-                             self._pose_world_imu_msg.position.y,
-                             self._pose_world_imu_msg.position.z,
-                             self._pose_world_imu_msg.orientation.x,
-                             self._pose_world_imu_msg.orientation.y,
-                             self._pose_world_imu_msg.orientation.z,
-                             self._pose_world_imu_msg.orientation.w)
+    # rovio_world == ENU TODO check me for CH.3 (marco-tranzatto)
+    self.create_tf_debug_node("enu", "sensor_imu_rovio", 
+                              self._pose_world_imu_msg.position.x,
+                              self._pose_world_imu_msg.position.y,
+                              self._pose_world_imu_msg.position.z,
+                              self._pose_world_imu_msg.orientation.x,
+                              self._pose_world_imu_msg.orientation.y,
+                              self._pose_world_imu_msg.orientation.z,
+                              self._pose_world_imu_msg.orientation.w,
+                              file_obj)
 
-    self.print_tf_debug_node("enu", "mav_imu",
-                             0.0,  # TODO check me (marco-tranzatto)
-                             0.0,  # TODO check me (marco-tranzatto)
-                             0.0,  # TODO check me (marco-tranzatto)
-                             self._q_EnuI[0],
-                             self._q_EnuI[1],
-                             self._q_EnuI[2],
-                             self._q_EnuI[3])
+    self.create_tf_debug_node("enu", "mav_imu",
+                              0.0,  # TODO check me for CH.3 (marco-tranzatto)
+                              0.0,  # TODO check me for CH.3 (marco-tranzatto)
+                              0.0,  # TODO check me for CH.3 (marco-tranzatto)
+                              self._q_EnuI[0],
+                              self._q_EnuI[1],
+                              self._q_EnuI[2],
+                              self._q_EnuI[3],
+                              file_obj)
 
     # following tf should overlap with enu_to_sensor_imu
     # full Sensor IMU posed form msf_parameters_vision
-    self.print_tf_debug_node("mav_imu", "sensor_imu_check",
-                             self._I_p_IC[0],  # TODO check me (marco-tranzatto)
-                             self._I_p_IC[1],  # TODO check me (marco-tranzatto)
-                             self._I_p_IC[2],  # TODO check me (marco-tranzatto)
-                             self._q_IC[0],
-                             self._q_IC[1],
-                             self._q_IC[2],
-                             self._q_IC[3])
-    rospy.loginfo("------------------------------------------------- ")
+    self.create_tf_debug_node("mav_imu", "sensor_imu_check",
+                              self._I_p_IC[0],
+                              self._I_p_IC[1],
+                              self._I_p_IC[2],
+                              self._q_IC[0],
+                              self._q_IC[1],
+                              self._q_IC[2],
+                              self._q_IC[3],
+                              file_obj)
+    
+    file_obj.write("\n</launch> \n\n")
+    file_obj.close()
 
-  def print_tf_debug_node(self, frame_id, child_frame_id, x, y, z, qx, qy, qz, qw):
-    rospy.loginfo("<node name=\"%s_to_%s_boadcaster\" pkg=\"tf\" type=\"static_transform_publisher\" \
-                    args=\" %.4f %.4f %.4f %.6f %.6f %.6f %.6f %s %s 100\" />",
+  def create_tf_debug_node(self, frame_id, child_frame_id, x, y, z, qx, qy, qz, qw, file_obj):
+
+    buffer = "<node name=\"%s_to_%s_boadcaster\" pkg=\"tf\" type=\"static_transform_publisher\" \
+                    args=\" %.4f %.4f %.4f %.6f %.6f %.6f %.6f %s %s 100\" />" % (
                     frame_id, child_frame_id,
                     x, y, z, 
                     qx, qy, qz, qw,
-                    frame_id, child_frame_id)        
+                    frame_id, child_frame_id)
+
+    file_obj.write(buffer)
+    file_obj.write("\n")
+                        
 
 if __name__ == '__main__':
   rospy.init_node('init_rovio_enu')
