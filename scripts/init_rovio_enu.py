@@ -60,12 +60,11 @@ class InitRovioEnu:
     self._q_Enu_I = [0.0, 0.0, 0.0, 1.0]
     self._pose_world_imu_msg = Pose()
 
-    # if init is not automatically, advertise service
-    if not self._send_reset_automatically:
-        self._reset_rovio_srv_server = rospy.Service(rospy.get_name() + 
-                                                     '/send_reset_to_rovio', 
-                                                     std_srvs.srv.Empty, 
-                                                     self.send_reset_to_rovio_service_callback)
+    # advertise service
+    self._reset_rovio_srv_server = rospy.Service(rospy.get_name() +
+                                                 '/send_reset_to_rovio',
+                                                 std_srvs.srv.Empty,
+                                                 self.send_reset_to_rovio_service_callback)
 
     # subscribe to Imu topic which contains the yaw orientation
     rospy.Subscriber("mag_imu", Imu, self.mag_imu_callback)
@@ -90,7 +89,12 @@ class InitRovioEnu:
         self._automatic_rovio_reset_sent_once = True
 
   def send_reset_to_rovio_service_callback(self, request):
-    self.send_reset_to_rovio()
+    if self._automatic_rovio_reset_sent_once:
+        rospy.logwarn(rospy.get_name() +
+                      ": reset sent automatically after %d IMU messages, rosservice call refused",
+                      self._samples_before_reset)
+    else:
+        self.send_reset_to_rovio()
     return std_srvs.srv.EmptyResponse()
 
   def send_reset_to_rovio(self):
