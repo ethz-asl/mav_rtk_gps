@@ -63,7 +63,7 @@ class InitRovioEnu:
     # advertise service
     self._reset_rovio_srv_server = rospy.Service(rospy.get_name() +
                                                  '/send_reset_to_rovio',
-                                                 std_srvs.srv.Empty,
+                                                 std_srvs.srv.Trigger, 
                                                  self.send_reset_to_rovio_service_callback)
 
     # subscribe to Imu topic which contains the yaw orientation
@@ -84,21 +84,32 @@ class InitRovioEnu:
     if  self._send_reset_automatically and not self._automatic_rovio_reset_sent_once and \
         self._num_external_pose_read > self._samples_before_reset:
 
-        self.send_reset_to_rovio()
-        # TODO (marco-tranzatto) check return of service call before setting this to false
-        self._automatic_rovio_reset_sent_once = True
+        (success, message) = self.send_reset_to_rovio()
+
+        if success:
+            self._automatic_rovio_reset_sent_once = True
+
+        rospy.loginfo(rospy.get_name() + " " + message)
 
   def send_reset_to_rovio_service_callback(self, request):
+    response = std_srvs.srv.TriggerResponse()
     if self._automatic_rovio_reset_sent_once:
-        rospy.logwarn(rospy.get_name() +
-                      ": reset sent automatically after %d IMU messages, rosservice call refused",
-                      self._samples_before_reset)
+        message = "Reset sent automatically after %d IMU messages, rosservice call refused." % \
+                  (self._samples_before_reset)
+
+        rospy.logwarn(rospy.get_name() + message)
+        response.success = False
+        response.message = message
     else:
-        self.send_reset_to_rovio()
-    return std_srvs.srv.EmptyResponse()
+        (success, message) = self.send_reset_to_rovio()
+        response.success = success
+        response.message = message
+
+    return response
 
   def send_reset_to_rovio(self):
     rospy.wait_for_service('rovio/reset_to_pose')
+
     try:
         rovio_reset_srv = rospy.ServiceProxy('rovio/reset_to_pose', SrvResetToPose)
 
@@ -123,8 +134,7 @@ class InitRovioEnu:
         self._pose_world_imu_msg.orientation.y = q_Enu_C[1]
         self._pose_world_imu_msg.orientation.z = q_Enu_C[2]
         
-        response = rovio_reset_srv(self._pose_world_imu_msg)
-        rospy.loginfo(rospy.get_name() + ": sent reset to Rovio")
+        rovio_reset_srv(self._pose_world_imu_msg)
 
         if self._verbose:
           (yaw, pitch, roll) = tf.euler_from_quaternion(self._q_Enu_I, 'rzyx')
@@ -135,8 +145,15 @@ class InitRovioEnu:
 
         self.create_rovio_init_info()
 
+        success = True
+        message = "Service call to reset Rovio internal state sent"
+
+        return (success, message)
+
     except rospy.ServiceException, e:
-        print "Service call to reset rovio internal state failed: %s"%e
+        success = False
+        message = "Service call to reset Rovio internal state failed: %s"%e
+        return (success, message)
 
   def create_rovio_init_info(self):
     # Debugging file for Rviz
