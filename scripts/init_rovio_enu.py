@@ -55,7 +55,7 @@ class InitRovioEnu:
                       ": reset has to be sent by calling service 'send_reset_to_rovio' ")
 
     # init other variables
-    self._num_external_pose_read = 0
+    self._num_imu_msgs_read = 0
     self._automatic_rovio_reset_sent_once = False
     self._q_Enu_I = [0.0, 0.0, 0.0, 1.0]
     self._pose_world_imu_msg = Pose()
@@ -63,7 +63,7 @@ class InitRovioEnu:
     # advertise service
     self._reset_rovio_srv_server = rospy.Service(rospy.get_name() +
                                                  '/send_reset_to_rovio',
-                                                 std_srvs.srv.Trigger, 
+                                                 std_srvs.srv.Trigger,
                                                  self.send_reset_to_rovio_service_callback)
 
     # subscribe to Imu topic which contains the yaw orientation
@@ -72,7 +72,7 @@ class InitRovioEnu:
     rospy.spin()
 
   def mag_imu_callback(self, imu_msg):
-    self._num_external_pose_read += 1
+    self._num_imu_msgs_read += 1
 
     # compute new pose to use when resetting ROVIO
     # orientation of the IMU frame of the MAV (body frame, or I frame according to MSF)
@@ -82,7 +82,7 @@ class InitRovioEnu:
                      imu_msg.orientation.w]
 
     if  self._send_reset_automatically and not self._automatic_rovio_reset_sent_once and \
-        self._num_external_pose_read > self._samples_before_reset:
+        self._num_imu_msgs_read > self._samples_before_reset:
 
         (success, message) = self.send_reset_to_rovio()
 
@@ -93,14 +93,18 @@ class InitRovioEnu:
 
   def send_reset_to_rovio_service_callback(self, request):
     response = std_srvs.srv.TriggerResponse()
-    if self._automatic_rovio_reset_sent_once:
+
+    if self._automatic_rovio_reset_sent_once or self._send_reset_automatically:
         message = "Reset sent automatically after %d IMU messages, rosservice call refused." % \
                   (self._samples_before_reset)
 
-        rospy.logwarn(rospy.get_name() + message)
+        rospy.logwarn(rospy.get_name() + " " + message)
         response.success = False
         response.message = message
-    else:
+    elif self._num_imu_msgs_read <= 0:
+        response.success = False
+        response.message = "No external IMU message received, at least one single orientation is needed."
+    else: # everything's fine, send reset
         (success, message) = self.send_reset_to_rovio()
         response.success = success
         response.message = message
