@@ -176,3 +176,4 @@ if __name__ == '__main__':
   try:
       init_rovio_enu = InitRovioEnu()
   except rospy.ROSInterruptException: pass
+
