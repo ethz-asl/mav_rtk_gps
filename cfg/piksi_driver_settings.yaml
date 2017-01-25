@@ -12,7 +12,7 @@ publish_navsatfix_spp: true
 publish_piksibaseline: true
 
 # SBP Navigation message types to be published
-publish_gps_time: false
+publish_gps_time: true
 publish_dops: true
 publish_pos_ecef: true
 publish_pos_llh: true
