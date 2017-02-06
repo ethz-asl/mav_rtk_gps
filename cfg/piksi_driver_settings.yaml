@@ -1,7 +1,8 @@
 
 # Use udevrule for piksi:
 # SUBSYSTEMS=="usb", KERNEL=="ttyUSB[0-9]*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", SYMLINK+="piksi", MODE="0666", GROUP="dialout"
-serial_port: '/dev/piksi' 
+serial_port: '/dev/ttyUSB0'
+baud_rate: 1000000
 
 # Coordinate frame of the GPS receiver with respect to the base link
 frame_id: 'base_link'

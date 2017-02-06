@@ -35,11 +35,12 @@ class Piksi:
         rospy.loginfo(rospy.get_name() + " start")
         rospy.loginfo("libsbp version currently used: " + sbp.version.get_git_version())
 
-        # Open a connection to Piksi using the default baud rate (1Mbaud)
+        # Open a connection to Piksi
         serial_port = rospy.get_param('~serial_port', '/dev/ttyUSB0')
+        baud_rate = rospy.get_param('~baud_rate', 1000000)
 
         try:
-            self._driver = PySerialDriver(serial_port, baud=1000000)
+            self._driver = PySerialDriver(serial_port, baud=baud_rate)
         except SystemExit:
             rospy.logerr("Piksi not found on serial port '%s'", serial_port)
 
