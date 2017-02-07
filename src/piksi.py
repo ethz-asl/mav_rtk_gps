@@ -50,6 +50,9 @@ class Piksi:
             rospy.logerr("Piksi not found on serial port '%s'", serial_port)
 
         self._base_station_mode = rospy.get_param('~base_station_mode', False)
+        self._udp_broadcast_addr = rospy.get_param('~broadcast_addr', '255.255.255.255')
+        self._udp_port = rospy.get_param('~broadcast_port', 26078)
+
         # Create a handler to connect Piksi driver to callbacks
         self._framer = Framer(self._driver.read, self._driver.write, verbose=True)
         self._handler = Handler(self._framer)
@@ -110,7 +113,7 @@ class Piksi:
         # subscribe to OBS messages and relay them via UDP if in base station mode
         if self._base_station_mode:
             rospy.loginfo("Starting in base station mode")
-            self._multicaster = UdpHelpers.SbpUdpMulticaster()
+            self._multicaster = UdpHelpers.SbpUdpMulticaster(self._udp_broadcast_addr, self._udp_port)
 
             self._handler.add_callback(self.callback_sbp_obs, msg_type=SBP_MSG_OBS)
             self._handler.add_callback(self.callback_sbp_obs_dep_a, msg_type=SBP_MSG_OBS_DEP_A)
@@ -120,7 +123,7 @@ class Piksi:
             self._handler.add_callback(self.callback_sbp_base_pos_ecef, msg_type=SBP_MSG_BASE_POS_ECEF)
         else:
             rospy.loginfo("Starting in client station mode")
-            self._multicast_recv = UdpHelpers.SbpUdpMulticastReceiver(self.multicast_callback)
+            self._multicast_recv = UdpHelpers.SbpUdpMulticastReceiver(self._udp_port, self.multicast_callback)
 
         # Initialize Navigation messages
         self.init_callback_and_publisher('baseline_ecef', msg_baseline_ecef,
@@ -236,27 +239,27 @@ class Piksi:
             self._handler.add_callback(callback_function, msg_type=sbp_msg_type)
 
     def callback_sbp_obs(self, msg, **metadata):
-        rospy.logwarn("CALLBACK SBP OBS")
+        # rospy.logwarn("CALLBACK SBP OBS")
         self._multicaster.sendSbpPacket(msg)
 
     def callback_sbp_obs_dep_a(self, msg, **metadata):
-        rospy.logwarn("CALLBACK SBP OBS DEP A")
+        # rospy.logwarn("CALLBACK SBP OBS DEP A")
         self._multicaster.sendSbpPacket(msg)
 
     def callback_sbp_obs_dep_b(self, msg, **metadata):
-        rospy.logwarn("CALLBACK SBP OBS DEP B")
+        # rospy.logwarn("CALLBACK SBP OBS DEP B")
         self._multicaster.sendSbpPacket(msg)
 
     def callback_sbp_base_pos_llh(self, msg, **metadata):
-        rospy.logwarn("CALLBACK SBP OBS BASE LLH")
+        # rospy.logwarn("CALLBACK SBP OBS BASE LLH")
         self._multicaster.sendSbpPacket(msg)
 
     def callback_sbp_base_pos_ecef(self, msg, **metadata):
-        rospy.logwarn("CALLBACK SBP OBS BASE LLH")
+        # rospy.logwarn("CALLBACK SBP OBS BASE LLH")
         self._multicaster.sendSbpPacket(msg)
 
     def multicast_callback(self, msg, **metadata):
-        rospy.logwarn("MULTICAST Callback")
+        # rospy.logwarn("MULTICAST Callback")
         if self._framer:
             self._framer(msg, **metadata)
         else:

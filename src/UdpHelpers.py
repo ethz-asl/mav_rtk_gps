@@ -26,11 +26,11 @@ class UDPDriver(BaseDriver):
             try:
                 data, addr = self.handle.recvfrom(4096)
                 if not data:
-                    raise IOError
+                    print "PIKSI UDP ERROR - no data from " + str(addr)
                 for d in data:
                     self.buf.append(d)
             except socket.error, msg:
-                raise IOError
+                print "PIKSI UDP ERROR " + str(msg)
 
         res = ''.join([self.buf.popleft() for i in xrange(min(size, len(self.buf)))])
         return res
@@ -59,9 +59,9 @@ class UDPDriver(BaseDriver):
 
 class UdpMulticaster:
 
-    def __init__(self):
-        self.multicast_address = "10.10.50.255"
-        self.port = 12345
+    def __init__(self, broadcast, port):
+        self.multicast_address = broadcast
+        self.port = port
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
 
@@ -71,17 +71,17 @@ class UdpMulticaster:
 
 
 class SbpUdpMulticaster(UdpMulticaster):
-    def __init__(self):
-        UdpMulticaster.__init__(self)
+    def __init__(self, broadcast, port):
+        UdpMulticaster.__init__(self, broadcast, port)
 
     def sendSbpPacket(self, sbp_data):
         self.sendPacket(sbp_data.pack())
 
 
 class SbpUdpMulticastReceiver:
-    def __init__(self, ext_callback):
+    def __init__(self, port, ext_callback):
         self._callback = ext_callback
-        self.driver = UDPDriver(' ', 12345)
+        self.driver = UDPDriver(' ', port)
         self.framer = Framer(self.driver.read, None, verbose=False)
         self.piksi = Handler(self.framer)
         self.piksi.add_callback(self.recv_callback)
