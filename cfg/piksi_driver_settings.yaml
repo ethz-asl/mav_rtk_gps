@@ -4,6 +4,8 @@
 serial_port: '/dev/ttyUSB0'
 baud_rate: 1000000
 base_station_mode: false
+# whenever possible, use network broadcast, not global ip broadcast
+# use ifconfig to show network broadcast (or calculate it yourself....)
 broadcast_addr: 10.10.50.255
 broadcast_port: 26078
 # Coordinate frame of the GPS receiver with respect to the base link
