@@ -62,6 +62,8 @@ class InitRovioEnu:
 
         # init other variables
         self._num_imu_msgs_read = 0
+        self._num_gps_transform_msgs_read = 0
+        self._latest_gps_transform = [0.0, 0.0, 0.0]
         self._automatic_rovio_reset_sent_once = False
         self._pose_world_imu_msg = Pose()
         self._T_Enu_I = tf.identity_matrix()
@@ -74,8 +76,15 @@ class InitRovioEnu:
 
         # subscribe to Imu topic which contains the yaw orientation
         rospy.Subscriber("mag_imu", Imu, self.mag_imu_callback)
+        rospy.Subscriber("gps_transform", TransformStamped, self.gps_transform_callback)
 
         rospy.spin()
+
+    def gps_transform_callback(self, gps_msg):
+        self._num_gps_transform_msgs_read += 1
+        self._latest_gps_transform = [gps_msg.transform.translation.x,
+                                      gps_msg.transform.translation.y,
+                                      gps_msg.transform.translation.z]
 
     def mag_imu_callback(self, imu_msg):
         self._num_imu_msgs_read += 1
@@ -88,16 +97,15 @@ class InitRovioEnu:
                    imu_msg.orientation.w]
         rotation = tf.quaternion_matrix(q_Enu_I)
 
-        # TODO (marco-tranzatto) check this for Challenge 3, for now assume ENU and
-        # Rovio world have same origin
-        translation = tf.translation_matrix([0.0, 0.0, 0.0])
+        # use latest position received from GPS
+        translation = tf.translation_matrix(self._latest_gps_transform)
 
         # full transformation from MAV IMU (I) to local ENU (East-North-Up) frame
         # do first translation and then rotation!
         self._T_Enu_I = tf.concatenate_matrices(translation, rotation)
 
         if  self._send_reset_automatically and not self._automatic_rovio_reset_sent_once and \
-            self._num_imu_msgs_read > self._samples_before_reset:
+            self._num_imu_msgs_read > self._samples_before_reset and self._num_gps_transform_msgs_read > 0:
             (success, message) = self.send_reset_to_rovio()
 
             if success:
@@ -118,6 +126,9 @@ class InitRovioEnu:
         elif self._num_imu_msgs_read <= 0:
             response.success = False
             response.message = "No external IMU message received, at least one single orientation is needed."
+        elif self._num_gps_transform_msgs_read <= 0:
+            response.success = False
+            response.message = "No external GPS transform message received, at least one single position is needed."
         else: # everything's fine, send reset
             (success, message) = self.send_reset_to_rovio()
             response.success = success
