@@ -57,7 +57,6 @@ class Piksi:
         self._framer = Framer(self._driver.read, self._driver.write, verbose=True)
         self._handler = Handler(self._framer)
 
-
         # Read settings
         self._var_spp_x = rospy.get_param('~var_spp_x', 25.0)
         self._var_spp_y = rospy.get_param('~var_spp_y', 25.0)
@@ -85,6 +84,8 @@ class Piksi:
         # Debug settings
         self._publish_piksidebug = rospy.get_param('~publish_piksidebug', True)
         self._publish_uart_state = rospy.get_param('~publish_uart_state', True)
+        self._publish_wifi_corrections_received = rospy.get_param('~publish_wifi_corrections_received', 
+                                                                  True)
 
         # Generate publisher and callback function for navsatfix messages
         self._pub_rtk_float = rospy.Publisher(rospy.get_name() + '/navsatfix_rtk_float',
@@ -190,14 +191,18 @@ class Piksi:
             self._pub_piksi_uart_state = rospy.Publisher(rospy.get_name() + '/debug/uart_state',
                                                          msg_uart_state, queue_size=10)
 
+        # corrections over wifi
+        self._num_wifi_corrections = PiksiNumCorrections()
+        self._num_wifi_corrections.header.seq = 0
+        self._num_wifi_corrections.received_corrections = 0
+        if self._publish_wifi_corrections_received:
+            self._pub_piksi_wifi_corrections = rospy.Publisher(rospy.get_name() + '/debug/wifi_corrections',
+                                                               PiksiNumCorrections, queue_size=10)
+
         self._handler.start()
 
         # Spin
         rospy.spin()
-
-        # Keep script alive
-        # while not rospy.is_shutdown():
-        #    rospy.sleep(0.5)
 
     def make_callback(self, sbp_type, ros_message, pub, attrs):
         """
@@ -262,9 +267,17 @@ class Piksi:
         # rospy.logwarn("MULTICAST Callback")
         if self._framer:
             self._framer(msg, **metadata)
+            
+            if self._publish_wifi_corrections_received:
+                self._num_wifi_corrections.header.seq += 1
+                now = rospy.get_rostime()
+                self._num_wifi_corrections.header.stamp.secs = now.secs
+                self._num_wifi_corrections.header.stamp.nsecs = now.nsecs
+                self._num_wifi_corrections.received_corrections += 1
+                self._pub_piksi_wifi_corrections.publish(self._num_wifi_corrections)
+
         else:
             rospy.logwarn("Received external SBP msg, but Piksi not connected.")
-
 
     def navsatfix_callback(self, msg_raw, **metadata):
         """
@@ -420,7 +433,6 @@ class Piksi:
         uart_state_msg.latency_current = msg.latency.current
 
         self._pub_piksi_uart_state.publish(uart_state_msg)
-
 
 # Main function.
 if __name__ == '__main__':
