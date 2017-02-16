@@ -1,7 +1,7 @@
 
 # Use udevrule for piksi:
 # SUBSYSTEMS=="usb", KERNEL=="ttyUSB[0-9]*", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6014", SYMLINK+="piksi", MODE="0666", GROUP="dialout"
-serial_port: '/dev/ttyUSB0'
+serial_port: '/dev/piksi'
 baud_rate: 1000000
 base_station_mode: false
 # whenever possible, use network broadcast, not global ip broadcast
