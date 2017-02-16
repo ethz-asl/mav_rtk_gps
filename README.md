@@ -20,3 +20,14 @@ chmod +x install/configure_environment.sh  #make sure the script is excutable
 ./install/configure_environment.sh         # WARNING: as side effect this script will add a line to your .bashrc
                                            # that appends the python subfolder of this repo to your $PYTHONPATH variable.
 ```
+## Corrections Over Wifi
+It is possible to send/receive corrections over Wifi between multiple Piksi modules.
+Set configurations in `cfg/piksi_driver_settings.yaml`
+- Base station configuration (sends corrections)
+ - `base_station_mode: true`
+ - `broadcast_addr: <put here Bcast address obtained from command ifconfig>`
+ - `broadcast_port: 26078`
+- Rover configuration (receives corrections)
+ - `base_station_mode: false`
+ - `broadcast_addr: <put here Bcast address obtained from command ifconfig>`
+ - `broadcast_port: 26078`
