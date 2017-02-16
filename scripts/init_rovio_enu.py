@@ -143,7 +143,7 @@ class InitRovioEnu:
             rovio_reset_srv = rospy.ServiceProxy('rovio/reset_to_pose', SrvResetToPose)
 
             # compute pose from local ENU (East-North-Up frame) to
-            # IMU frame of the MAV (== body frame or C frame, according to MSF)
+            # IMU frame of the ViSensor (== C frame, according to MSF)
             T_Enu_C = tf.concatenate_matrices(self._T_Enu_I, self._T_I_C)
             q_Enu_C = tf.quaternion_from_matrix(T_Enu_C)
 
