@@ -83,7 +83,7 @@ class Piksi:
         self._publish_tracking_state = rospy.get_param('~publish_tracking_state', True)
 
         # Debug settings
-        self._publish_piksidebug = rospy.get_param('~publish_piksidebug', False)
+        self._publish_piksidebug = rospy.get_param('~publish_piksidebug', True)
         self._publish_uart_state = rospy.get_param('~publish_uart_state', True)
 
         # Generate publisher and callback function for navsatfix messages
