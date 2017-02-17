@@ -28,9 +28,10 @@ import sbp.version
 
 # networking stuff
 import UdpHelpers
-
 import time
-
+import subprocess
+import re
+import threading, time
 
 class Piksi:
     def __init__(self):
@@ -86,6 +87,9 @@ class Piksi:
         self._publish_uart_state = rospy.get_param('~publish_uart_state', True)
         self._publish_wifi_corrections_received = rospy.get_param('~publish_wifi_corrections_received', 
                                                                   True)
+        self._base_station_ip_for_latency_estimation = rospy.get_param(
+                                                            '~base_station_ip_for_latency_estimation',
+                                                            '10.10.50.1')
 
         # Generate publisher and callback function for navsatfix messages
         self._pub_rtk_float = rospy.Publisher(rospy.get_name() + '/navsatfix_rtk_float',
@@ -191,18 +195,55 @@ class Piksi:
             self._pub_piksi_uart_state = rospy.Publisher(rospy.get_name() + '/debug/uart_state',
                                                          msg_uart_state, queue_size=10)
 
-        # corrections over wifi
+        # corrections over wifi message, if we are not the base station
         self._num_wifi_corrections = PiksiNumCorrections()
         self._num_wifi_corrections.header.seq = 0
         self._num_wifi_corrections.received_corrections = 0
-        if self._publish_wifi_corrections_received:
+        self._num_wifi_corrections.latency = -1
+        if self._publish_wifi_corrections_received and not self._base_station_mode:
             self._pub_piksi_wifi_corrections = rospy.Publisher(rospy.get_name() + '/debug/wifi_corrections',
                                                                PiksiNumCorrections, queue_size=10)
+            # start new thread to periodically ping base station
+            threading.Thread(target=self.ping_base_station_over_wifi).start()
 
         self._handler.start()
 
         # Spin
         rospy.spin()
+
+    def ping_base_station_over_wifi(self):
+        """
+        Ping base station pereiodically without blocking the driver
+        """
+
+        ping_deadline_seconds = 3
+        interval_between_pings_seconds = 5
+
+        while not rospy.is_shutdown():
+            # send ping command
+            command = ["ping",
+                       "-w", str(ping_deadline_seconds), # deadline before stopping attempt
+                       "-c", "1", # number of pings to send
+                       self._base_station_ip_for_latency_estimation]
+            ping = subprocess.Popen(command, stdout = subprocess.PIPE)
+
+            out, error = ping.communicate()
+            # search for 'min/avg/max/mdev' rount trip delay time (rtt) numbers
+            matcher = re.compile("(\d+.\d+)/(\d+.\d+)/(\d+.\d+)/(\d+.\d+)")
+
+            if matcher.search(out) == None:
+                # no ping response within ping_deadline_seconds
+                # in python write and read operations on built-in type are atomic.
+                # there's no need to use mutex
+                self._num_wifi_corrections.latency = -1
+            else:
+                groups_rtt = matcher.search(out).groups()
+                avg_rtt = groups_rtt[1]
+                # in python write and read operations on built-in type are atomic.
+                # there's no need to use mutex
+                self._num_wifi_corrections.latency = float(avg_rtt)
+
+            time.sleep(interval_between_pings_seconds)
 
     def make_callback(self, sbp_type, ros_message, pub, attrs):
         """
@@ -268,6 +309,7 @@ class Piksi:
         if self._framer:
             self._framer(msg, **metadata)
             
+            # publish debug message about wifi corrections, if enabled
             if self._publish_wifi_corrections_received:
                 self._num_wifi_corrections.header.seq += 1
                 now = rospy.get_rostime()
