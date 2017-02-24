@@ -9,5 +9,8 @@
     <rosparam file="$(find piksi_rtk_gps)/cfg/piksi_driver_settings.yaml"/>
   </node>
 
+  <!-- Piksi node -->
+  <node name="rosbag_record_survey" pkg="rosbag" type="rosbag"
+    args="record -o /navsatfix_spp /rosout"/>
 
 </launch>
