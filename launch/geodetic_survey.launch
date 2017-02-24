@@ -2,7 +2,7 @@
 <launch>
 
   <!-- Number of fixes used to mean the coordinates of the base station -->
-  <arg name="n_fix" default="6000"/>
+  <arg name="n_fix" default="10000"/>
 
   <!-- Piksi node -->
   <node pkg="piksi_rtk_gps" type="piksi.py" name="piksi">
