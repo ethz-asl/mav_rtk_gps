@@ -15,7 +15,9 @@
   </node>
 
   <!-- Piksi node -->
-  <node name="rosbag_record_survey" pkg="rosbag" type="rosbag"
-    args="record -o /navsatfix_spp /rosout"/>
+  <node name="rosbag_record_survey" pkg="rosbag" type="record" output="screen"
+    args="-o $(find mbzirc_init_rovio)/geodetic_survey_bags/
+          /navsatfix_spp
+          /rosout"/>
 
 </launch>
