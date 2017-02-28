@@ -46,10 +46,6 @@ class InitRovioEnu:
         # with respect to MAV IMU (I frame, accordin to MSF)
         self._I_p_I_V = rospy.get_param('~mavimu_p_mavimu_gps', [0.0, 0.0, 0.0])
 
-        # manually set this paramter if testing in Vicon
-        # it will be overwritten in any case after the first external GPS measurement
-        self._Enu_p_Enu_V = rospy.get_param('~vicon_p_vicon_gps', [0.0, 0.0, 0.0])
-
         # full transformation from MAV IMU (I) to sensor IMU (C)
         rotation = tf.quaternion_matrix(q_I_C)
         translation = tf.translation_matrix(I_p_I_C)
@@ -72,9 +68,18 @@ class InitRovioEnu:
         # init other variables
         self._num_imu_msgs_read = 0
         self._num_gps_transform_msgs_read = 0
+        self._Enu_p_Enu_V = [0.0, 0.0, 0.0]
         self._automatic_rovio_reset_sent_once = False
         self._pose_world_imu_msg = Pose()
         self._T_Enu_I = tf.identity_matrix()
+
+        # allow testing in Vicon
+        testing_in_vicon =  rospy.get_param('~testing_in_vicon', False)
+        if testing_in_vicon:
+          # manually set this paramter if testing in Vicon
+          # it will be overwritten in any case after the first external GPS measurement
+          self._Enu_p_Enu_V = rospy.get_param('~vicon_p_vicon_gps', [0.0, 0.0, 0.0])
+          self._num_gps_transform_msgs_read = 1
 
         # advertise service
         self._reset_rovio_srv_server = rospy.Service(rospy.get_name() +
