@@ -17,6 +17,7 @@ from sensor_msgs.msg import Imu
 from rovio.srv import SrvResetToPose
 import math
 import os
+import numpy as np
 
 class InitRovioEnu:
 
@@ -41,6 +42,10 @@ class InitRovioEnu:
         I_p_I_C_z = rospy.get_param('~pose_sensor/init/p_ic/z', 0.0)
         I_p_I_C = [I_p_I_C_x, I_p_I_C_y, I_p_I_C_z]
 
+        # position of GPS antenna (V frame, accordin to Rovio)
+        # with respect to MAV IMU (I frame, accordin to MSF)
+        self._I_p_I_V = rospy.get_param('~mavimu_p_mavimu_gps', [0.0, 0.0, 0.0])
+
         # full transformation from MAV IMU (I) to sensor IMU (C)
         rotation = tf.quaternion_matrix(q_I_C)
         translation = tf.translation_matrix(I_p_I_C)
@@ -63,7 +68,7 @@ class InitRovioEnu:
         # init other variables
         self._num_imu_msgs_read = 0
         self._num_gps_transform_msgs_read = 0
-        self._latest_gps_transform = [0.0, 0.0, 0.0]
+        self._Enu_p_Enu_V = [0.0, 0.0, 0.0]
         self._automatic_rovio_reset_sent_once = False
         self._pose_world_imu_msg = Pose()
         self._T_Enu_I = tf.identity_matrix()
@@ -82,9 +87,9 @@ class InitRovioEnu:
 
     def gps_transform_callback(self, gps_msg):
         self._num_gps_transform_msgs_read += 1
-        self._latest_gps_transform = [gps_msg.transform.translation.x,
-                                      gps_msg.transform.translation.y,
-                                      gps_msg.transform.translation.z]
+        self._Enu_p_Enu_V = [ gps_msg.transform.translation.x,
+                              gps_msg.transform.translation.y,
+                              gps_msg.transform.translation.z]
 
     def mag_imu_callback(self, imu_msg):
         self._num_imu_msgs_read += 1
@@ -95,14 +100,17 @@ class InitRovioEnu:
                    imu_msg.orientation.y,
                    imu_msg.orientation.z,
                    imu_msg.orientation.w]
-        rotation = tf.quaternion_matrix(q_Enu_I)
+        R_Enu_I = tf.quaternion_matrix(q_Enu_I)
 
-        # use latest position received from GPS
-        translation = tf.translation_matrix(self._latest_gps_transform)
+        # use latest position received from GPS, but first compute position of MAV IMU from GPS
+        I_p_I_V = np.array(self._I_p_I_V)
+        Enu_p_I_V = np.dot(R_Enu_I[0:3][0:3], I_p_I_V)
+        Enu_p_ENU_I = self._Enu_p_Enu_V - Enu_p_I_V
+        p_ENU_I = tf.translation_matrix(Enu_p_ENU_I)
 
         # full transformation from MAV IMU (I) to local ENU (East-North-Up) frame
         # do first translation and then rotation!
-        self._T_Enu_I = tf.concatenate_matrices(translation, rotation)
+        self._T_Enu_I = tf.concatenate_matrices(p_ENU_I, R_Enu_I)
 
         if  self._send_reset_automatically and not self._automatic_rovio_reset_sent_once and \
             self._num_imu_msgs_read > self._samples_before_reset and self._num_gps_transform_msgs_read > 0:
