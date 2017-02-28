@@ -47,10 +47,9 @@ class InitRovioEnu:
         self._I_p_I_V = rospy.get_param('~mavimu_p_mavimu_gps', [0.0, 0.0, 0.0])
 
         # full transformation from MAV IMU (I) to sensor IMU (C)
-        rotation = tf.quaternion_matrix(q_I_C)
-        translation = tf.translation_matrix(I_p_I_C)
         # do first translation and then rotation!
-        self._T_I_C = tf.concatenate_matrices(translation, rotation)
+        self._T_I_C = tf.concatenate_matrices(tf.translation_matrix(I_p_I_C),
+                                              tf.quaternion_matrix(q_I_C))
 
         if self._verbose:
             rospy.loginfo(rospy.get_name() +
@@ -111,6 +110,7 @@ class InitRovioEnu:
         R_Enu_I = tf.quaternion_matrix(q_Enu_I)
 
         # use latest position received from GPS, but first compute position of MAV IMU from GPS
+        # by subtracting offset between MAV IMU and GPS antenna
         I_p_I_V = np.array(self._I_p_I_V)
         Enu_p_I_V = np.dot(R_Enu_I[0:3, 0:3], I_p_I_V)
         Enu_p_ENU_I = self._Enu_p_Enu_V - Enu_p_I_V
