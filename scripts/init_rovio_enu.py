@@ -62,8 +62,8 @@ class InitRovioEnu:
 
         # init other variables
         self._num_imu_msgs_read = 0
-        self._num_gps_transform_msgs_read = 0
-        self._latest_gps_transform = [0.0, 0.0, 0.0]
+        self._num_gps_transform_msgs_read = 1
+        self._latest_gps_transform = [-1.0, 0.0, 0.2]
         self._automatic_rovio_reset_sent_once = False
         self._pose_world_imu_msg = Pose()
         self._T_Enu_I = tf.identity_matrix()
