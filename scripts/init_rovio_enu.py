@@ -107,7 +107,7 @@ class InitRovioEnu:
 
         # use latest position received from GPS, but first compute position of MAV IMU from GPS
         I_p_I_V = np.array(self._I_p_I_V)
-        Enu_p_I_V = np.dot(R_Enu_I[0:3][0:3], I_p_I_V)
+        Enu_p_I_V = np.dot(R_Enu_I[0:3, 0:3], I_p_I_V)
         Enu_p_ENU_I = self._Enu_p_Enu_V - Enu_p_I_V
         p_ENU_I = tf.translation_matrix(Enu_p_ENU_I)
 
