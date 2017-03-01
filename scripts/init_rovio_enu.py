@@ -113,11 +113,11 @@ class InitRovioEnu:
         # by subtracting offset between MAV IMU and GPS antenna
         I_p_I_V = np.array(self._I_p_I_V)
         Enu_p_I_V = np.dot(R_Enu_I[0:3, 0:3], I_p_I_V)
-        Enu_p_ENU_I = self._Enu_p_Enu_V - Enu_p_I_V
+        Enu_p_Enu_I = self._Enu_p_Enu_V - Enu_p_I_V
 
         # full transformation from MAV IMU (I) to local ENU (East-North-Up) frame
         # do first translation and then rotation!
-        self._T_Enu_I = tf.concatenate_matrices(tf.translation_matrix(Enu_p_ENU_I), 
+        self._T_Enu_I = tf.concatenate_matrices(tf.translation_matrix(Enu_p_Enu_I),
                                                 R_Enu_I)
 
         if  self._send_reset_automatically and not self._automatic_rovio_reset_sent_once and \
