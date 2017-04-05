@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>mbzirc_init_rovio</name>
+  <name>init_rovio_npose0</name>
   <version>0.0.0</version>
   <description>
-    Nodes to initiliaze ROVIO for the MBZIRC.
+    Nodes to initiliaze ROVIO when compiled with option NPOSE=0.
   </description>
 
   <maintainer email="marcot@ethz.ch">Marco Tranzatto</maintainer>
