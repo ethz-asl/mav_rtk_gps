@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Number of fixes used to mean the coordinates of the base station -->
+  <arg name="n_fix" default="10000"/>
+
+  <!-- geodetic_utils node: compute mean of base station location -->
+  <node pkg="geodetic_utils" type="set_gps_reference_node" name="set_gps_reference_node" args="$(arg n_fix) average" output="screen">
+    <remap from="gps" to="/piksi/navsatfix_spp" />
+  </node>
+
+  <!-- Piksi node -->
+  <node pkg="piksi_rtk_gps" type="piksi.py" name="piksi">
+    <rosparam file="$(find piksi_rtk_gps)/cfg/piksi_driver_settings.yaml"/>
+  </node>
+
+  <!-- Piksi node -->
+  <node name="rosbag_record_survey" pkg="rosbag" type="record" output="screen"
+    args="-o $(find mbzirc_init_rovio)/geodetic_survey_bags/base_station_survey
+          /navsatfix_spp
+          /rosout"/>
+
+</launch>

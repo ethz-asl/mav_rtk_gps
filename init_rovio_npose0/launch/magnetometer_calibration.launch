@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- Before launching this file remember to,
+       1. Set ROS_MASTER_URI with ROS uri of the MAV you want to calibrate; 
+       2. Set ROS_IP with IP of your machine.
+       OR 
+       1. roscd mav_startup/scripts/
+       2. source configure_ros_network.sh.sh <IP_ROS_MASTER>
+       Script meant to be used mainly with Hummingbird MAVs. -->
+  <arg name="raw_mag_topic" default="/hawk/fcu/mag"/>
+
+  <!-- Plotting, useful to look for max magnetic field in each axis -->
+  <node name="rqt_plot" pkg="rqt_plot" type="rqt_plot"
+        args="$(arg raw_mag_topic)/vector"
+        respawn="false" output="screen" />
+
+  <!-- Rosbag raw mag -->
+  <node pkg="rosbag" type="record" name="rosbag_record" respawn="true" output="screen"
+        args="-o $(find mbzirc_init_rovio)/magnetometer_calibration/raw_magnetometer_bags/calib_data
+              $(arg raw_mag_topic)" />
+
+</launch>

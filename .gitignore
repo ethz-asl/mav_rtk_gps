@@ -1,3 +1,5 @@
 .idea/*
 utils/bags/*
 src/*.pyc
+
+geodetic_survey_bags/*.bag
