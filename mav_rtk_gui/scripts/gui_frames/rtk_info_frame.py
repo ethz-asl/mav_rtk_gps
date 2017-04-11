@@ -114,27 +114,27 @@ class RtkInfoFrame:
         self.ping_corrections_wifi_status.grid(row=current_row, column=1)
 
         # Subscribe to topics.
-        rospy.Subscriber(self.topic_names['piksi_receiver_state_topic'], ReceiverState,
+        rospy.Subscriber(self.topic_names['piksi_receiver_state'], ReceiverState,
                          self.receiver_state_callback)
-        rospy.Subscriber(self.topic_names['piksi_uart_state_topic'], UartState,
+        rospy.Subscriber(self.topic_names['piksi_uart_state'], UartState,
                          self.uart_state_callback)
-        rospy.Subscriber(self.topic_names['piksi_baseline_ned_topic'], BaselineNed,
+        rospy.Subscriber(self.topic_names['piksi_baseline_ned'], BaselineNed,
                          self.baseline_ned_callback)
-        rospy.Subscriber(self.topic_names['piksi_wifi_corrections_topic'], InfoWifiCorrections,
+        rospy.Subscriber(self.topic_names['piksi_wifi_corrections'], InfoWifiCorrections,
                          self.wifi_corrections_callback)
 
     def get_topic_names(self):
         # RTK info topics
         topic_names = {}
 
-        topic_names['piksi_receiver_state_topic'] = rospy.get_param('~piksi_receiver_state_topic',
-                                                                    'piksi/debug/receiver_state')
-        topic_names['piksi_uart_state_topic'] = rospy.get_param('~piksi_uart_state_topic',
-                                                                'piksi/debug/uart_state')
-        topic_names['piksi_baseline_ned_topic'] = rospy.get_param('~piksi_baseline_ned_topic',
-                                                                  'piksi/baseline_ned')
-        topic_names['piksi_wifi_corrections_topic'] = rospy.get_param('~piksi_num_wifi_corrections_topic',
-                                                                      'piksi/debug/wifi_corrections')
+        topic_names['piksi_receiver_state'] = rospy.get_param('~piksi_receiver_state_topic',
+                                                              'piksi/debug/receiver_state')
+        topic_names['piksi_uart_state'] = rospy.get_param('~piksi_uart_state_topic',
+                                                          'piksi/debug/uart_state')
+        topic_names['piksi_baseline_ned'] = rospy.get_param('~piksi_baseline_ned_topic',
+                                                            'piksi/baseline_ned')
+        topic_names['piksi_wifi_corrections'] = rospy.get_param('~piksi_num_wifi_corrections_topic',
+                                                                'piksi/debug/wifi_corrections')
 
         # Check if we should add a leading namespace
         if rospy.has_param('~namespace'):
@@ -169,7 +169,6 @@ class RtkInfoFrame:
 
         self.signal_strength_status['text'] = buffer
 
-
     def uart_state_callback(self, msg):
         # uart a throughput
         self.uart_a_throughput_status['text'] = str(round(msg.uart_a_rx_throughput, 3))
@@ -183,7 +182,6 @@ class RtkInfoFrame:
         # uart b crc errors
         self.uart_b_crc_errors_status['text'] = str(msg.uart_b_crc_error_count)
 
-
     def baseline_ned_callback(self, msg):
         # number of satellites used for RTK fix
         self.number_sat_rtk_status['text'] = str(msg.n_sats)
@@ -191,7 +189,6 @@ class RtkInfoFrame:
         # baseline NED, from mm to m
         buffer = "[%.3f, %.3f, %.3f]" % (msg.n / 1e3, msg.e / 1e3, msg.d / 1e3)
         self.baseline_ned_status['text'] = buffer
-
 
     def wifi_corrections_callback(self, msg):
         # number of corrections received
