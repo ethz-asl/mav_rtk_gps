@@ -12,7 +12,7 @@ from gui_frames.rtk_info_frame import RtkInfoFrame
 from gui_frames.rtk_fix_plot_frame import RtkFixPlotFrame
 
 
-class BasicGui:
+class RtkInfo:
     def __init__(self):
         # Main tkinter window.
         self.root = Tk()
@@ -50,6 +50,6 @@ if __name__ == '__main__':
 
     # go to class functions that do all the heavy lifting. Do error checking.
     try:
-        basic_gui = BasicGui()
+        rtk_info_gui = RtkInfo()
     except rospy.ROSInterruptException:
         pass
