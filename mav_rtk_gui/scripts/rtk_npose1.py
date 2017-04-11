@@ -61,7 +61,7 @@ class RtkNpose1:
         return msf_frame
 
 if __name__ == '__main__':
-    rospy.init_node('basic_gui')
+    rospy.init_node('rtk_npose1')
     rospy.loginfo(rospy.get_name() + ' start')
 
     # go to class functions that do all the heavy lifting. Do error checking.
