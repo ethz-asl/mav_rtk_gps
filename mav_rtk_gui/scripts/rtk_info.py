@@ -9,6 +9,7 @@ import rospy
 from Tkinter import *
 
 from gui_frames.rtk_info_frame import RtkInfoFrame
+from gui_frames.rtk_fix_plot_frame import RtkFixPlotFrame
 
 
 class BasicGui:
@@ -21,8 +22,14 @@ class BasicGui:
         self.column_0 = Frame(self.root)
         self.column_0.pack(side = LEFT)
 
+        self.row_0 = Frame(self.column_0)
+        self.row_0.pack(side = TOP)
+        self.row_1 = Frame(self.column_0)
+        self.row_1.pack(side = TOP)
+
         # Create required frames.
-        self.rtk_info_frame = self.create_rtk_info_frame(self.column_0)
+        self.rtk_info_frame = self.create_rtk_info_frame(self.row_0)
+        self.rtk_fix_plot_frame = self.create_rtk_fix_plot_frame(self.row_1)
 
         # rospy.spin is not needed in this case.
         self.root.mainloop()
@@ -31,6 +38,11 @@ class BasicGui:
         rtk_info_frame = RtkInfoFrame(parent_frame)
 
         return rtk_info_frame
+
+    def create_rtk_fix_plot_frame(self, parent_frame):
+        rtk_fix_plot_frame = RtkFixPlotFrame(parent_frame)
+
+        return rtk_fix_plot_frame
 
 if __name__ == '__main__':
     rospy.init_node('basic_gui')
