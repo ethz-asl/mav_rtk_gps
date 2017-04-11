@@ -147,7 +147,7 @@ class RtkInfoFrame:
         return topic_names
 
     def receiver_state_callback(self, msg):
-        # type of fix
+        # Type of fix.
         if msg.rtk_mode_fix == True:
             self.type_of_fix_status['bg'] = "green"
             self.type_of_fix_status['fg'] = "white"
@@ -157,55 +157,55 @@ class RtkInfoFrame:
             self.type_of_fix_status['fg'] = "black"
             self.type_of_fix_status['text'] = "Float"
 
-        # number of satellites
+        # Number of satellites.
         self.number_sat_status['text'] = str(msg.num_sat)
 
-        # signal strength, use only one decimal digit
+        # Signal strength, use only one decimal digit.
         buffer = '['
         for single_signal_strength in msg.cn0:
             buffer += str(round(single_signal_strength, 1)) + ', '
-        # remove last coma and space
+        # Remove last coma and space.
         buffer = buffer[:-2]
         buffer += ']'
 
         self.signal_strength_status['text'] = buffer
 
     def uart_state_callback(self, msg):
-        # uart a throughput
+        # Uart a throughput.
         self.uart_a_throughput_status['text'] = str(round(msg.uart_a_rx_throughput, 3))
 
-        # uart a crc errors
+        # Uart a crc errors.
         self.uart_a_crc_errors_status['text'] = str(msg.uart_a_crc_error_count)
 
-        # uart b throughput
+        # Uart b throughput.
         self.uart_b_throughput_status['text'] = str(round(msg.uart_b_rx_throughput, 3))
 
-        # uart b crc errors
+        # Uart b crc errors.
         self.uart_b_crc_errors_status['text'] = str(msg.uart_b_crc_error_count)
 
     def baseline_ned_callback(self, msg):
-        # number of satellites used for RTK fix
+        # Number of satellites used for RTK fix.
         self.number_sat_rtk_status['text'] = str(msg.n_sats)
 
-        # baseline NED, from mm to m
+        # Baseline NED, from mm to m.
         buffer = "[%.3f, %.3f, %.3f]" % (msg.n / 1e3, msg.e / 1e3, msg.d / 1e3)
         self.baseline_ned_status['text'] = buffer
 
     def wifi_corrections_callback(self, msg):
-        # number of corrections received
+        # Number of corrections received.
         self.number_corrections_wifi_status['text'] = str(msg.received_corrections)
 
-        # compute rate corrections
+        # Compute rate corrections.
         width_time_window = rospy.get_time() - self.time_first_sample_moving_window
-        print width_time_window
+
         if width_time_window >= wifiCorrectionsHzAverage:
             samples_in_time_window = msg.received_corrections - self.num_corrections_first_sample_moving_window
             average_corrections_hz = samples_in_time_window / width_time_window
             self.hz_corrections_wifi_status['text'] = str(round(average_corrections_hz, 1))
 
-            # reset and start again
+            # Reset and start again.
             self.num_corrections_first_sample_moving_window = msg.received_corrections
             self.time_first_sample_moving_window = rospy.get_time()
 
-        # ping base estation
+        # Ping base station.
         self.ping_corrections_wifi_status['text'] = str(round(msg.latency, 2))
