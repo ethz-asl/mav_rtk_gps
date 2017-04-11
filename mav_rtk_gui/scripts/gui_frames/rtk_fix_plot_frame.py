@@ -12,11 +12,11 @@ figureSizeWidth = 5.5
 figureSizeHeight = 2
 
 class RtkFixPlotFrame:
-    def __init__(self, master_window):
+    def __init__(self, parent_window):
         # Topic Names.
         self.topic_names = self.get_topic_names()
 
-        self.main_label = Label(master_window, text = "RTK Fix Plot", font = "Times 14 bold")
+        self.main_label = Label(parent_window, text ="RTK Fix Plot", font ="Times 14 bold")
         self.main_label.grid(row = 0, columnspan = 2)
 
         # Plot for RTK fix.
@@ -30,7 +30,7 @@ class RtkFixPlotFrame:
         self.axes_rtk_fix.set_ylabel('RTK Fix')
         self.axes_rtk_fix.grid()
 
-        self.canvas = FigureCanvasTkAgg(self.figure, master = master_window)
+        self.canvas = FigureCanvasTkAgg(self.figure, master = parent_window)
         self.canvas.show()
         self.canvas.get_tk_widget().grid(rowspan = 4, columnspan = 2)
 
