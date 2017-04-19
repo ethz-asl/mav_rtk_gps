@@ -139,7 +139,6 @@ class RtkInfoFrame:
         name_space = rospy.get_param('~namespace', '')
         for key, value in topic_names.iteritems():
             topic_names[key] = helpers.get_full_namespace(name_space, value)
-            print topic_names[key]
 
         return topic_names
 
