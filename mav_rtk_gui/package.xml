@@ -14,7 +14,7 @@
   <buildtool_depend>catkin_simple</buildtool_depend>
 
   <depend>rospy</depend>
-  <depend>piksi_rtk_gps</depend>
+  <depend>piksi_rtk_msgs</depend>
   <depend>nav_msgs</depend>
 
 </package>
