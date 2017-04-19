@@ -32,6 +32,7 @@ class RtkFixPlotFrame:
         self.axes_rtk_fix.set_xlabel('Time [s]')
         self.axes_rtk_fix.set_ylabel('RTK Fix')
         self.axes_rtk_fix.grid()
+        self.figure.tight_layout()
 
         self.canvas = FigureCanvasTkAgg(self.figure, master=parent_window)
         self.canvas.show()

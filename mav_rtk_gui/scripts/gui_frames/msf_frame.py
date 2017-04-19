@@ -88,6 +88,9 @@ class MsfFrame:
         self.line_vy = []
         self.line_vz = []
 
+        # Make labels tight
+        self.figure.tight_layout()
+
         # Subscribe to topics.
         rospy.Subscriber(self.topic_names['msf_odometry'], Odometry,
                          self.odometry_callback)
