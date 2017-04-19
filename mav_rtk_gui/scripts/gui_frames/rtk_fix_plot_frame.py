@@ -13,7 +13,6 @@ maxLengthDequeArray = 100
 figureSizeWidth = 5.5
 figureSizeHeight = 2
 
-
 class RtkFixPlotFrame:
     def __init__(self, parent_window):
         # Topic Names.

@@ -15,7 +15,6 @@ maxLengthDequeArray = 150
 figureSizeWidth = 6.5
 figureSizeHeight = 5
 
-
 class MsfFrame:
     def __init__(self, parent_window):
         # Topics & services Names.
@@ -114,7 +113,6 @@ class MsfFrame:
         service_names['init_msf_scale'] = rospy.get_param('~init_msf_scale_srv',
                                                           'pose_sensor_rovio/pose_sensor/initialize_msf_scale')
 
-        # Check if we should add a leading namespace
         # Check if we should add a leading namespace
         name_space = '/'
         if rospy.has_param('~namespace'):

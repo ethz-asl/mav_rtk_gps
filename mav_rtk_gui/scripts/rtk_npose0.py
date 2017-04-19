@@ -13,7 +13,6 @@ from gui_frames.rtk_fix_plot_frame import RtkFixPlotFrame
 from gui_frames.rovio_frame import RovioFrame
 from gui_frames.msf_frame import MsfFrame
 
-
 class RtkNpose0:
     def __init__(self):
         # Main tkinter window.
@@ -75,7 +74,7 @@ if __name__ == '__main__':
     rospy.init_node('rtk_npose0')
     rospy.loginfo(rospy.get_name() + ' start')
 
-    # go to class functions that do all the heavy lifting. Do error checking.
+    # Go to class functions that do all the heavy lifting. Do error checking.
     try:
         rtk_npose0_gui = RtkNpose0()
     except rospy.ROSInterruptException:

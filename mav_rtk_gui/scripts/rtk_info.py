@@ -11,7 +11,6 @@ from Tkinter import *
 from gui_frames.rtk_info_frame import RtkInfoFrame
 from gui_frames.rtk_fix_plot_frame import RtkFixPlotFrame
 
-
 class RtkInfo:
     def __init__(self):
         # Main tkinter window.
@@ -48,7 +47,7 @@ if __name__ == '__main__':
     rospy.init_node('rtk_info')
     rospy.loginfo(rospy.get_name() + ' start')
 
-    # go to class functions that do all the heavy lifting. Do error checking.
+    # Go to class functions that do all the heavy lifting. Do error checking.
     try:
         rtk_info_gui = RtkInfo()
     except rospy.ROSInterruptException:

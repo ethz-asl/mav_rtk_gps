@@ -1,5 +1,6 @@
 ##
-## Put here relative topic names! They will be append to namespace name
+# If you put here relative topic names, they will be append to namespace.
+# If you put absolute topics, no leading namespace will be added.
 ##
 namespace: 'auk'
 

@@ -16,7 +16,6 @@ from piksi_rtk_msgs.msg import InfoWifiCorrections
 
 wifiCorrectionsHzAverage = 5  # Compute corrections Hz over wifiCorrectionsHzAverage seconds
 
-
 class RtkInfoFrame:
     def __init__(self, parent_window):
         # Topic Names.
