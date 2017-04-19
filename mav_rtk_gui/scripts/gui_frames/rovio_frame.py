@@ -1,4 +1,5 @@
 import rospy
+import helpers
 
 from Tkinter import *
 import std_srvs.srv
@@ -41,8 +42,8 @@ class RovioFrame:
             name_space = rospy.get_param('~namespace')
             name_space = '/' + name_space + '/'
 
-        for key, value in topic_names.iteritems():
-            topic_names[key] = helpers.get_full_namespace(name_space, value)
+        for key, value in service_names.iteritems():
+            service_names[key] = helpers.get_full_namespace(name_space, value)
 
         return service_names
 
