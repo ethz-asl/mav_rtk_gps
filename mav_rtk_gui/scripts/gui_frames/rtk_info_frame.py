@@ -136,13 +136,10 @@ class RtkInfoFrame:
                                                                 'piksi/debug/wifi_corrections')
 
         # Check if we should add a leading namespace
-        name_space = '/'
-        if rospy.has_param('~namespace'):
-            name_space = rospy.get_param('~namespace')
-            name_space = '/' + name_space + '/'
-
+        name_space = rospy.get_param('~namespace', '')
         for key, value in topic_names.iteritems():
             topic_names[key] = helpers.get_full_namespace(name_space, value)
+            print topic_names[key]
 
         return topic_names
 

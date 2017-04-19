@@ -43,11 +43,7 @@ class RovioFrame:
                                                       'init_rovio_enu/send_reset_to_rovio')
 
         # Check if we should add a leading namespace
-        name_space = '/'
-        if rospy.has_param('~namespace'):
-            name_space = rospy.get_param('~namespace')
-            name_space = '/' + name_space + '/'
-
+        name_space = rospy.get_param('~namespace', '')
         for key, value in service_names.iteritems():
             service_names[key] = helpers.get_full_namespace(name_space, value)
 

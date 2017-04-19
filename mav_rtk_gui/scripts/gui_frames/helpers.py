@@ -9,6 +9,11 @@ def get_full_namespace(name_space, topic):
     if topic[0] == '/':
         full_name = topic
     else:
-        full_name = name_space + topic
+        if name_space == '':
+            # no namespace specified, use absolute name
+            full_name = '/' + topic
+        else:
+            # add leading namespace
+            full_name = '/' + name_space + '/' + topic
 
     return full_name
