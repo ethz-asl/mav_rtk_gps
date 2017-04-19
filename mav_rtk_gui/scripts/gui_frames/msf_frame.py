@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+#
+#  Title:        msf_frame.py
+#  Description:  Reset MSF frame to be attached to a GUI.
+#
 import rospy
 from Tkinter import *
 import matplotlib

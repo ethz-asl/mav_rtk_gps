@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+#
+#  Title:        rtk_fix_plot_frame.py
+#  Description:  GPS Plot frame to be attached to a GUI.
+#
 import rospy
 from Tkinter import *
 import matplotlib

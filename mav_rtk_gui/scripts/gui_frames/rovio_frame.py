@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+
+#
+#  Title:        rovio_frame.py
+#  Description:  Reset Rovio frame to be attached to a GUI.
+#
 import rospy
 import helpers
 
