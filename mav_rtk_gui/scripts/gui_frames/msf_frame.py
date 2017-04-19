@@ -112,15 +112,17 @@ class MsfFrame:
                                                           'pose_sensor_rovio/pose_sensor/initialize_msf_scale')
 
         # Check if we should add a leading namespace
+        # Check if we should add a leading namespace
+        name_space = '/'
         if rospy.has_param('~namespace'):
             name_space = rospy.get_param('~namespace')
             name_space = '/' + name_space + '/'
 
-            for key, value in topic_names.iteritems():
-                topic_names[key] = helpers.get_full_namespace(name_space, value)
+        for key, value in topic_names.iteritems():
+            topic_names[key] = helpers.get_full_namespace(name_space, value)
 
-            for key, value in service_names.iteritems():
-                service_names[key] = helpers.get_full_namespace(name_space, value)
+        for key, value in service_names.iteritems():
+            service_names[key] = helpers.get_full_namespace(name_space, value)
 
         return topic_names, service_names
 
