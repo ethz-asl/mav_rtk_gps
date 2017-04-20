@@ -144,7 +144,7 @@ class MsfFrame:
             return
 
         # Data time.
-        secs = float(msg.header.stamp.secs) + float(msg.header.stamp.nsecs) / float(1e9)
+        secs = msg.header.stamp.to_sec()
 
         if not self.first_odometry_received:
             self.first_odometry_received = True

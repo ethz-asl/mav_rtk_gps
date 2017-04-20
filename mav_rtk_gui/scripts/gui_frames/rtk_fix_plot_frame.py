@@ -70,7 +70,7 @@ class RtkFixPlotFrame:
 
     def receiver_state_callback(self, msg):
         # Data time.
-        secs = rospy.get_time()
+        secs = msg.header.stamp.to_sec()
 
         if not self.first_receiver_state_received:
             self.first_receiver_state_received = True
