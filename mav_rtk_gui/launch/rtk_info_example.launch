@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+
+  <node name="rtk_info_gui" pkg="mav_rtk_gui" type="rtk_info.py" output="screen">
+    <rosparam file="$(find mav_rtk_gui)/cfg/topic_names_example.yaml"/>
+
+    <!-- Overwrtie needed settings -->
+    <param name="namespace" value=""/> <!-- Assume Piksi is not in any namespace. -->
+
+  </node>
+
+</launch>

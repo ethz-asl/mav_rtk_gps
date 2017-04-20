@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+#
+#  Title:        rtk_info.py
+#  Description:  ROS module to create basic GUI to check RTK status.
+#
+
+import rospy
+from Tkinter import *
+
+from gui_frames.rtk_info_frame import RtkInfoFrame
+from gui_frames.rtk_fix_plot_frame import RtkFixPlotFrame
+
+class RtkInfo:
+    def __init__(self):
+        # Main tkinter window.
+        self.root = Tk()
+        self.root.wm_title("RTK Info")
+
+        # Screen division.
+        self.column_0 = Frame(self.root)
+        self.column_0.pack(side = LEFT)
+
+        self.row_0 = Frame(self.column_0)
+        self.row_0.pack(side = TOP)
+        self.row_1 = Frame(self.column_0)
+        self.row_1.pack(side = TOP)
+
+        # Create required frames.
+        self.rtk_info_frame = self.create_rtk_info_frame(self.row_0)
+        self.rtk_fix_plot_frame = self.create_rtk_fix_plot_frame(self.row_1)
+
+        # rospy.spin is not needed in this case.
+        self.root.mainloop()
+
+    def create_rtk_info_frame(self, parent_frame):
+        rtk_info_frame = RtkInfoFrame(parent_frame)
+
+        return rtk_info_frame
+
+    def create_rtk_fix_plot_frame(self, parent_frame):
+        rtk_fix_plot_frame = RtkFixPlotFrame(parent_frame)
+
+        return rtk_fix_plot_frame
+
+if __name__ == '__main__':
+    rospy.init_node('rtk_info')
+    rospy.loginfo(rospy.get_name() + ' start')
+
+    # Go to class functions that do all the heavy lifting. Do error checking.
+    try:
+        rtk_info_gui = RtkInfo()
+    except rospy.ROSInterruptException:
+        pass

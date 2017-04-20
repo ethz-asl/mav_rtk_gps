@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>mav_rtk_gui</name>
+  <version>0.0.0</version>
+  <description>
+    GUI interfaces to check RTK status and reset state estimation.
+  </description>
+
+  <maintainer email="marcot@ethz.ch">Marco Tranzatto</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>piksi_rtk_msgs</depend>
+  <depend>nav_msgs</depend>
+
+</package>
+
