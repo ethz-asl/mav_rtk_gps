@@ -12,7 +12,7 @@ import rospy
 import tf.transformations as tf
 from std_msgs.msg import *
 import std_srvs.srv
-from geometry_msgs.msg import TransformStamped, Pose
+from geometry_msgs.msg import TransformStamped, Pose, PoseWithCovarianceStamped
 from sensor_msgs.msg import Imu
 from rovio.srv import SrvResetToPose
 import math
@@ -88,10 +88,19 @@ class InitRovioEnu:
 
         # subscribe to Imu topic which contains the yaw orientation
         rospy.Subscriber(rospy.get_name() + "/mag_imu", Imu, self.mag_imu_callback)
+        # use either gps_transform or gps_pose
         rospy.Subscriber(rospy.get_name() + "/gps_transform", TransformStamped, 
                          self.gps_transform_callback)
+        rospy.Subscriber(rospy.get_name() + "/gps_pose", PoseWithCovarianceStamped,
+                         self.gps_pose_callback)
 
         rospy.spin()
+
+    def gps_pose_callback(self, pose_msg):
+        self._num_gps_transform_msgs_read += 1
+        self._Enu_p_Enu_V = [ pose_msg.pose.pose.position.x,
+                              pose_msg.pose.pose.position.y,
+                              pose_msg.pose.pose.position.z]
 
     def gps_transform_callback(self, gps_msg):
         self._num_gps_transform_msgs_read += 1
