@@ -14,6 +14,7 @@ Published and subscribed topics/services
 - Subscribed topics:
   - **`init_rovio_enu/mag_imu`** of type `sensor_msgs/Imu Message`. This is the orientation of the MAV IMU with respect to local ENU frame.
   - **`init_rovio_enu/gps_transform`** of type `geometry_msgs/TransformStamped`. This is the transformation (rotation does not really matter in this case) from local ENU frame to GPS antenna.
+  - **`init_rovio_enu/gps_pose`** of type `geometry_msgs/PoseWithCovarianceStamped`. This is the pose (rotation does not really matter in this case) from local ENU frame to GPS antenna. (use either `init_rovio_enu/gps_transform` or `init_rovio_enu/gps_pose`).
   
 - Advertised services:
   - **`init_rovio_enu/send_reset_to_rovio`** of type `std_srvs/Trigger`. This resets Rovio internal state and alignes Rovio odometry frame to local ENU frame.
