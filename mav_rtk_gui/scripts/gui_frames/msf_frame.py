@@ -52,46 +52,51 @@ class MsfFrame:
         self.init_scale_entry.insert(0, '1.0')  # default value
         self.init_scale_entry.grid(row=current_row, column=1)
 
-        # Subplots for position and velocity from MSF.
-        self.first_odometry_received = False
-        self.first_time_odometry = 0
+        # Reset msf view.
+        current_row = 3
+        self.reset_view_button = Button(parent_window,
+                                        text="Reset View",
+                                        command=self.reset_view_handler)
+        self.reset_view_button.grid(row=current_row, column=0)
 
+        # Subplots for position and velocity from MSF.
         self.figure = Figure(figsize=(figureSizeWidth, figureSizeHeight), dpi=75)
         self.figure.subplots_adjust(hspace=.4)
 
-        # Position.
-        self.axes_position = self.figure.add_subplot(211)
-        self.axes_position.set_xlabel('Time [s]')
-        self.axes_position.set_ylabel('Position [m]')
-        self.axes_position.grid()
-
-        # Velocity.
-        self.axes_velocity = self.figure.add_subplot(212)
-        self.axes_velocity.set_xlabel('Time [s]')
-        self.axes_velocity.set_ylabel('Velocity [m/s]')
-        self.axes_velocity.grid()
+        self.first_odometry_received = False
+        self.reset_plot_view = False
+        self.first_time_odometry = 0
 
         self.canvas = FigureCanvasTkAgg(self.figure, master=parent_window)
         self.canvas.show()
         self.canvas.get_tk_widget().grid(rowspan=4, columnspan=2)
 
+        # Position.
+        self.axes_position = []
+
+        # Velocity.
+        self.axes_velocity = []
+
         # Position data.
-        self.odometry_msg_count = 0
-        self.time_odometry = deque([], maxlen=maxLengthDequeArray)
-        self.x = deque([], maxlen=maxLengthDequeArray)
-        self.y = deque([], maxlen=maxLengthDequeArray)
-        self.z = deque([], maxlen=maxLengthDequeArray)
+        self.odometry_msg_count = []
+        self.time_odometry = []
+        self.x = []
+        self.y = []
+        self.z = []
         self.line_x = []
         self.line_y = []
         self.line_z = []
 
         # Velocity data.
-        self.vx = deque([], maxlen=maxLengthDequeArray)
-        self.vy = deque([], maxlen=maxLengthDequeArray)
-        self.vz = deque([], maxlen=maxLengthDequeArray)
+        self.vx = []
+        self.vy = []
+        self.vz = []
         self.line_vx = []
         self.line_vy = []
         self.line_vz = []
+
+        # Init data.
+        self.reset_view_handler()
 
         # Make labels tight
         self.figure.tight_layout()
@@ -137,6 +142,48 @@ class MsfFrame:
         new_height = float(self.init_height_entry.get())
         self.init_height_srv(new_height)
 
+    def reset_view_handler(self):
+
+        if not self.first_odometry_received:
+            # Init subplots.
+            self.axes_position = self.figure.add_subplot(211)
+            self.axes_velocity = self.figure.add_subplot(212)
+
+        else:
+            # Clear subplots.
+            self.axes_position.clear()
+            self.axes_velocity.clear()
+
+        # Position.
+        self.axes_position.set_xlabel('Time [s]')
+        self.axes_position.set_ylabel('Position [m]')
+        self.axes_position.grid()
+
+        # Velocity.
+        self.axes_velocity.set_xlabel('Time [s]')
+        self.axes_velocity.set_ylabel('Velocity [m/s]')
+        self.axes_velocity.grid()
+
+        # Position data.
+        self.odometry_msg_count = 0
+        self.time_odometry = deque([], maxlen=maxLengthDequeArray)
+        self.x = deque([], maxlen=maxLengthDequeArray)
+        self.y = deque([], maxlen=maxLengthDequeArray)
+        self.z = deque([], maxlen=maxLengthDequeArray)
+        self.line_x = []
+        self.line_y = []
+        self.line_z = []
+
+        # Velocity data.
+        self.vx = deque([], maxlen=maxLengthDequeArray)
+        self.vy = deque([], maxlen=maxLengthDequeArray)
+        self.vz = deque([], maxlen=maxLengthDequeArray)
+        self.line_vx = []
+        self.line_vy = []
+        self.line_vz = []
+
+        self.reset_plot_view = True
+
     def odometry_callback(self, msg):
         # Downsample odometry.
         self.odometry_msg_count += 1
@@ -146,8 +193,9 @@ class MsfFrame:
         # Data time.
         secs = msg.header.stamp.to_sec()
 
-        if not self.first_odometry_received:
+        if not self.first_odometry_received or self.reset_plot_view:
             self.first_odometry_received = True
+            self.reset_plot_view = False
             self.first_time_odometry = secs
 
             # Plot empty lines for position.
@@ -186,10 +234,9 @@ class MsfFrame:
         self.line_z.set_xdata(self.time_odometry)
         self.line_z.set_ydata(self.z)
 
-        self.axes_position.set_xlim(min(self.time_odometry), max(self.time_odometry))
-        # Add +/- 1 meter to y limit to help visualization.
-        self.axes_position.set_ylim(min(min(self.x), min(self.y), min(self.z)) - 1.0,
-                                    max(max(self.x), max(self.y), max(self.z)) + 1.0)
+        # Adjust view based on new data.
+        self.axes_position.relim()
+        self.axes_position.autoscale_view()
 
         # Update velocity lines.
         self.line_vx.set_xdata(self.time_odometry)
@@ -199,10 +246,9 @@ class MsfFrame:
         self.line_vz.set_xdata(self.time_odometry)
         self.line_vz.set_ydata(self.vz)
 
-        self.axes_velocity.set_xlim(min(self.time_odometry), max(self.time_odometry))
-        # Add +/- 0.5 meter/s to y limit to help visualization.
-        self.axes_velocity.set_ylim(min(min(self.vx), min(self.vy), min(self.vz)) - 0.5,
-                                    max(max(self.vx), max(self.vy), max(self.vz)) + 0.5)
+        # Adjust view based on new data.
+        self.axes_velocity.relim()
+        self.axes_velocity.autoscale_view()
 
         # Final draw.
         self.canvas.draw()
