@@ -5,3 +5,4 @@ src/*.pyc
 geodetic_survey_bags/*.bag
 
 *.pyc
+init_rovio_npose0/launch/debug_tf_frames.launch
