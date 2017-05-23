@@ -59,6 +59,13 @@ class MsfFrame:
                                         command=self.reset_view_handler)
         self.reset_view_button.grid(row=current_row, column=0)
 
+        # Local altitude.
+        current_row = 4
+        self.altitude_label = Label(parent_window, text="Local Altitude [m]: ", font="Sans 8")
+        self.altitude_label.grid(row=current_row, column=0)
+        self.altitude_status = Label(parent_window, text="", font="Sans 8")
+        self.altitude_status.grid(row=current_row, column=1)
+
         # Subplots for position and velocity from MSF.
         self.figure = Figure(figsize=(figureSizeWidth, figureSizeHeight), dpi=75)
         self.figure.subplots_adjust(hspace=.4)
@@ -214,6 +221,9 @@ class MsfFrame:
             self.line_vx.set_linewidth(2.0)
             self.line_vy.set_linewidth(2.0)
             self.line_vz.set_linewidth(2.0)
+
+        # Local altitude.
+        self.altitude_status['text'] = str(round(msg.pose.pose.position.z, 2))
 
         # Position data.
         self.time_odometry.append(secs - self.first_time_odometry)
