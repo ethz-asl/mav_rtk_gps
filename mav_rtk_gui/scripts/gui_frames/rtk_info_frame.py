@@ -6,6 +6,7 @@
 #
 import rospy
 import helpers
+from collections import deque
 
 from Tkinter import *
 
@@ -13,8 +14,10 @@ from piksi_rtk_msgs.msg import ReceiverState
 from piksi_rtk_msgs.msg import UartState
 from piksi_rtk_msgs.msg import BaselineNed
 from piksi_rtk_msgs.msg import InfoWifiCorrections
+from sensor_msgs.msg import NavSatFix, NavSatStatus
 
 wifiCorrectionsHzAverage = 5  # Compute corrections Hz over wifiCorrectionsHzAverage seconds
+altitudeAverageSamples = 10
 
 class RtkInfoFrame:
     def __init__(self, parent_window):
@@ -88,8 +91,16 @@ class RtkInfoFrame:
         self.baseline_ned_status = Label(parent_window, text="", font="Sans 8")
         self.baseline_ned_status.grid(row=current_row, column=1)
 
-        # Number of corrections over wifi.
+        # Navsat Fix altitude.
         current_row = 10
+        self.altitude_label = Label(parent_window, text="Navsat fix altitude (avg)[m]: ", font="Sans 8")
+        self.altitude_label.grid(row=current_row)
+        self.altitude_status = Label(parent_window, text="", font="Sans 8")
+        self.altitude_status.grid(row=current_row, column=1)
+        self.altitude = deque([], maxlen=altitudeAverageSamples)
+
+        # Number of corrections over wifi.
+        current_row = 11
         self.number_corrections_wifi_label = Label(parent_window, text="Number of corrections over wifi: ",
                                                    font="Sans 8")
         self.number_corrections_wifi_label.grid(row=current_row)
@@ -97,7 +108,7 @@ class RtkInfoFrame:
         self.number_corrections_wifi_status.grid(row=current_row, column=1)
 
         # Rate corrections over wifi.
-        current_row = 11
+        current_row = 12
         self.hz_corrections_wifi_label = Label(parent_window, text="Rate corrections over wifi [Hz]: ", font="Sans 8")
         self.hz_corrections_wifi_label.grid(row=current_row)
         self.hz_corrections_wifi_status = Label(parent_window, text="0", font="Sans 8")
@@ -106,7 +117,7 @@ class RtkInfoFrame:
         self.num_corrections_first_sample_moving_window = 0
 
         # Ping with base station.
-        current_row = 12
+        current_row = 13
         self.ping_corrections_wifi_label = Label(parent_window, text="Ping base station [ms]: ", font="Sans 8")
         self.ping_corrections_wifi_label.grid(row=current_row)
         self.ping_corrections_wifi_status = Label(parent_window, text="-1", font="Sans 8")
@@ -121,6 +132,8 @@ class RtkInfoFrame:
                          self.baseline_ned_callback)
         rospy.Subscriber(self.topic_names['piksi_wifi_corrections'], InfoWifiCorrections,
                          self.wifi_corrections_callback)
+        rospy.Subscriber(self.topic_names['piksi_navsatfix_rtk_fix'], NavSatFix,
+                         self.navsatfix_rtk_fix_callback)
 
     def get_topic_names(self):
         # RTK info topics
@@ -134,6 +147,8 @@ class RtkInfoFrame:
                                                             'piksi/baseline_ned')
         topic_names['piksi_wifi_corrections'] = rospy.get_param('~piksi_num_wifi_corrections_topic',
                                                                 'piksi/debug/wifi_corrections')
+        topic_names['piksi_navsatfix_rtk_fix'] = rospy.get_param('~piksi_navsatfix_rtk_fix',
+                                                                 'piksi/navsatfix_rtk_fix')
 
         # Check if we should add a leading namespace
         name_space = rospy.get_param('~namespace', '')
@@ -205,3 +220,8 @@ class RtkInfoFrame:
 
         # Ping base station.
         self.ping_corrections_wifi_status['text'] = str(round(msg.latency, 2))
+
+    def navsatfix_rtk_fix_callback(self, msg):
+        self.altitude.append(msg.altitude)
+        altitude_avg = sum(self.altitude) / len(self.altitude)
+        self.altitude_status['text'] = str(round(altitude_avg, 2))
