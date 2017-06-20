@@ -151,10 +151,10 @@ class PiksiMulti:
         self.handler.add_callback(self.uart_state_callback, msg_type=SBP_MSG_UART_STATE)
 
         # Callbacks generated "automatically".
-        self.init_callback('baseline_ecef_multi', BaselineEcefMulti,
+        self.init_callback('baseline_ecef_multi', BaselineEcef,
                            SBP_MSG_BASELINE_ECEF, MsgBaselineECEF,
                            'tow', 'x', 'y', 'z', 'accuracy', 'n_sats', 'flags')
-        self.init_callback('baseline_ned_multi', BaselineNedMulti,
+        self.init_callback('baseline_ned_multi', BaselineNed,
                            SBP_MSG_BASELINE_NED, MsgBaselineNED,
                            'tow', 'n', 'e', 'd', 'h_accuracy', 'v_accuracy', 'n_sats', 'flags')
         self.init_callback('dops_multi', DopsMulti,
@@ -164,7 +164,7 @@ class PiksiMulti:
         self.init_callback('utc_time_multi', UtcTimeMulti,
                            SBP_MSG_UTC_TIME, MsgUtcTime,
                            'flags', 'tow', 'year', 'month', 'day', 'hours', 'minutes', 'seconds', 'ns')
-        self.init_callback('pos_ecef_multi', PosEcefMulti,
+        self.init_callback('pos_ecef_multi', PosEcef,
                            SBP_MSG_POS_ECEF, MsgPosECEF,
                            'tow', 'x', 'y', 'z', 'accuracy', 'n_sats', 'flags')
         self.init_callback('vel_ecef', VelEcef,
@@ -239,7 +239,7 @@ class PiksiMulti:
         publishers['receiver_state'] = rospy.Publisher(rospy.get_name() + '/debug/receiver_state',
                                                        ReceiverState, queue_size=10)
         publishers['uart_state_multi'] = rospy.Publisher(rospy.get_name() + '/debug/uart_state',
-                                                         UartStateMulti, queue_size=10)
+                                                         UartState, queue_size=10)
         # Do not publish llh message, prefer publishing directly navsatfix_spp or navsatfix_rtk_fix.
         # publishers['pos_llh'] = rospy.Publisher(rospy.get_name() + '/pos_llh',
         #                                        PosLlh, queue_size=10)
@@ -263,7 +263,7 @@ class PiksiMulti:
         publishers['gps_time_multi'] = rospy.Publisher(rospy.get_name() + '/gps_time',
                                                        GpsTimeMulti, queue_size=10)
         publishers['baseline_ned_multi'] = rospy.Publisher(rospy.get_name() + '/baseline_ned',
-                                                           BaselineNedMulti, queue_size=10)
+                                                           BaselineNed, queue_size=10)
         publishers['utc_time_multi'] = rospy.Publisher(rospy.get_name() + '/utc_time',
                                                        UtcTimeMulti, queue_size=10)
         publishers['imu_raw_multi'] = rospy.Publisher(rospy.get_name() + '/imu_raw',
@@ -283,11 +283,11 @@ class PiksiMulti:
             publishers['enu_transform_float'] = rospy.Publisher(rospy.get_name() + '/enu_transform_float',
                                                                 TransformStamped, queue_size=10)
             publishers['baseline_ecef_multi'] = rospy.Publisher(rospy.get_name() + '/baseline_ecef',
-                                                                BaselineEcefMulti, queue_size=10)
+                                                                BaselineEcef, queue_size=10)
             publishers['dops_multi'] = rospy.Publisher(rospy.get_name() + '/dops',
                                                        DopsMulti, queue_size=10)
             publishers['pos_ecef_multi'] = rospy.Publisher(rospy.get_name() + '/pos_ecef',
-                                                           PosEcefMulti, queue_size=10)
+                                                           PosEcef, queue_size=10)
 
         if not self.base_station_mode:
             publishers['wifi_corrections'] = rospy.Publisher(rospy.get_name() + '/debug/wifi_corrections',
@@ -570,11 +570,9 @@ class PiksiMulti:
         self.publishers['receiver_state'].publish(self.receiver_state_msg)
 
     def uart_state_callback(self, msg_raw, **metadata):
-        # for now use deprecated uart_msg, as the latest one doesn't seem to work properly with libspb 1.2.1
-#         msg = MsgUartStateDepa(msg_raw)
         msg = MsgUartState(msg_raw)
 
-        uart_state_msg = UartStateMulti()
+        uart_state_msg = UartState()
         uart_state_msg.header.stamp = rospy.Time.now()
 
         uart_state_msg.uart_a_tx_throughput = msg.uart_a.tx_throughput
