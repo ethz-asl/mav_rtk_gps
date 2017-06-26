@@ -2,7 +2,7 @@
 
 <launch>
 
-  <node name="rtk_npose0_gui" pkg="mav_rtk_gui" type="rtk_npose0.py" output="screen">
+  <node name="rtk_npose0_gui" pkg="mav_rtk_gui" type="rtk_npose0" output="screen">
     <rosparam file="$(find mav_rtk_gui)/cfg/piksi_topic_names_example.yaml"/>
   </node>
 
