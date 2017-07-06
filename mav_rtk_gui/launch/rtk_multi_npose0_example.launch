@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-
-<launch>
-
-  <node name="rtk_npose0_gui" pkg="mav_rtk_gui" type="rtk_npose0.py" output="screen">
-    <rosparam file="$(find mav_rtk_gui)/cfg/piksi_multi_topic_names_example.yaml"/>
-  </node>
-
-</launch>
