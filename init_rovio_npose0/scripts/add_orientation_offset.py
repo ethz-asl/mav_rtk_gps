@@ -5,7 +5,7 @@
 #  Description:  ROS module to add a constant offset to incoming IMU messages.
 #                WARNING, use this module ONLY to initialize Rovio with NPOSE=0, as ONLY IMU orientation is processed,
 #                accelerations and gyros are not affected!!!
-#  Convention:   q_out =  q_offset * q_in
+#  Convention:   q_out =  q_in * q_offset
 
 import rospy
 from sensor_msgs.msg import Imu
@@ -37,7 +37,7 @@ class AddOrientationOffset:
                 msg.orientation.z,
                 msg.orientation.w]
 
-        q_out = tf.quaternion_multiply(self.orientation_offset, q_in)
+        q_out = tf.quaternion_multiply(q_in, self.orientation_offset)
 
         imu_out = msg
         imu_out.orientation.x = q_out[0]
