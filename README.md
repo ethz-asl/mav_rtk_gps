@@ -30,6 +30,10 @@ RTK fix obtained in average in 10 minutes.
  - [Configure Your Piksi V2](https://github.com/ethz-asl/mav_rtk_gps/wiki/Installing-and-Configuring-Piksi#settings-piksi-v2).
  - [Example Launch Files](https://github.com/ethz-asl/mav_rtk_gps/tree/master/piksi_rtk_gps#usage).
 
+License
+-------
+3-Clause BSD; see LICENSE
+
 Credits
 -------
 Marco Tranzatto, Michael Pantic, Kai Holtmann - ETHZ ASL & RSL - 17 July 2017
