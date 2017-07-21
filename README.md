@@ -28,8 +28,21 @@ RTK fix obtained in average in 3 minutes.
 RTK fix obtained in average in 10 minutes.
  - [Install Piksi V2 ROS Driver](https://github.com/ethz-asl/mav_rtk_gps/tree/master/piksi_rtk_gps#installation).
  - [Configure Your Piksi V2](https://github.com/ethz-asl/mav_rtk_gps/wiki/Installing-and-Configuring-Piksi#settings-piksi-v2).
-  - [Example Launch Files](https://github.com/ethz-asl/mav_rtk_gps/tree/master/piksi_rtk_gps#usage).
+ - [Example Launch Files](https://github.com/ethz-asl/mav_rtk_gps/tree/master/piksi_rtk_gps#usage).
+
+License
+-------
+The source code is released under a [BSD 3-Clause license](https://github.com/ethz-asl/mav_rtk_gps/blob/master/LICENSE).
+
+Credits
+-------
+Marco Tranzatto, Michael Pantic, Kai Holtmann - ETHZ ASL & RSL - 17 July 2017
 
 Contact
 -------
 Marco Tranzatto marcot(at)ethz.ch
+
+
+Bugs & Feature Requests
+-------
+Please report bugs and request features using the [Issue Tracker](https://github.com/ethz-asl/mav_rtk_gps/issues).

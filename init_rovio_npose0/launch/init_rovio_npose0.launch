@@ -1,0 +1,31 @@
+<?xml version="1.0"?> 
+<launch> 
+ 
+  <!-- This is an example to show how to use init_rovio_enu. You will need to adapt the parameters below
+       according to the configuration of your robot. -->
+  <node name="init_rovio_enu" pkg="init_rovio_npose0" type="init_rovio_enu.py" output="screen">
+
+    <remap from="init_rovio_enu/gps_transform" to="piksi/enu_transform_fix"/>
+    <!-- imu topic contains the orientation of the MAV IMU with respect to local ENU frame. -->
+    <remap from="init_rovio_enu/mag_imu" to="imu"/>
+
+    <!-- Calibration data from MAV IMU to VI-sensor IMU, obtained with Kalibr. -->
+    <param name="pose_sensor/init/q_ic/w" value="0.322009683087"/>
+    <param name="pose_sensor/init/q_ic/x" value="-0.625685914678"/>
+    <param name="pose_sensor/init/q_ic/y" value="0.634675742115"/>
+    <param name="pose_sensor/init/q_ic/z" value="-0.31939568335"/>
+
+    <param name="pose_sensor/init/p_ic/x" value="-0.31939568335"/>
+    <param name="pose_sensor/init/p_ic/y" value="0.002383129862"/>
+    <param name="pose_sensor/init/p_ic/z" value="-0.0713450023489"/>
+
+    <!-- GPS antenna placed 11 cm above MAV IMU. -->
+    <rosparam param="mavimu_p_mavimu_gps">[0.0, 0.0, 0.11]</rosparam>
+
+    <!-- Other settings -->
+    <param name="send_reset_automatically" value="False"/>
+
+  </node>
+
+</launch> 
+
