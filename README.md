@@ -32,7 +32,7 @@ RTK fix obtained in average in 10 minutes.
 
 License
 -------
-3-Clause BSD; see LICENSE
+The source code is released under a [BSD 3-Clause license](https://github.com/ethz-asl/mav_rtk_gps/blob/master/LICENSE).
 
 Credits
 -------
@@ -41,3 +41,8 @@ Marco Tranzatto, Michael Pantic, Kai Holtmann - ETHZ ASL & RSL - 17 July 2017
 Contact
 -------
 Marco Tranzatto marcot(at)ethz.ch
+
+
+Bugs & Feature Requests
+-------
+Please report bugs and request features using the [Issue Tracker](https://github.com/ethz-asl/mav_rtk_gps/issues).
