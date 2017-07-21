@@ -8,8 +8,8 @@
 import rospy
 from Tkinter import *
 
-from gui_frames.rtk_info_frame import RtkInfoFrame
-from gui_frames.rtk_fix_plot_frame import RtkFixPlotFrame
+from mav_rtk_gui.gui_frames.rtk_info_frame import RtkInfoFrame
+from mav_rtk_gui.gui_frames.rtk_fix_plot_frame import RtkFixPlotFrame
 
 class RtkInfo:
     def __init__(self):
