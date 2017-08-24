@@ -37,6 +37,7 @@ The source code is released under a [BSD 3-Clause license](https://github.com/et
 Credits
 -------
 Marco Tranzatto, Michael Pantic, Kai Holtmann - ETHZ ASL & RSL - 17 July 2017
+Based on the initial work of Daniel Eckert.
 
 Contact
 -------
