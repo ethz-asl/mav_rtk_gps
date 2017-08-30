@@ -38,6 +38,8 @@ Credits
 -------
 Marco Tranzatto, Michael Pantic, Kai Holtmann - ETHZ ASL & RSL - 17 July 2017
 
+Based on the initial work of Daniel Eckert.
+
 Contact
 -------
 Marco Tranzatto marcot(at)ethz.ch
