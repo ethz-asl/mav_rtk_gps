@@ -12,3 +12,4 @@ init_rovio_npose0/launch/debug_tf_frames.launch
 *.includes
 *.creator
 *.user
+*.config
