@@ -15,6 +15,7 @@ Overview
 - [piksi_rtk_gps](https://github.com/ethz-asl/mav_rtk_gps/tree/master/piksi_rtk_gps): ROS driver for Piksi RTK receiver device, hardware version [V2](http://docs.swiftnav.com/pdfs/piksi_datasheet_v2.3.1.pdf).
 - [piksi_rtk_kml](https://github.com/ethz-asl/mav_rtk_gps/tree/master/piksi_rtk_kml): ROS node to generate KML files (Keyhole Markup Language) from Piksi messages. These files can be visualized in Google Earth.
 - [piksi_rtk_msgs](https://github.com/ethz-asl/mav_rtk_gps/tree/master/piksi_rtk_msgs): ROS messages used by the driver(s).
+- [rqt_gps_rtk_plugin](https://github.com/ethz-asl/mav_rtk_gps/tree/000f0b39705381219216c71ebdef63e95beff60b/rqt_gps_rtk_plugin): another handy Graphical User Interface to check the status of RTK fix. This gui is implemented wit [Qt](https://wiki.qt.io/Install_Qt_5_on_Ubuntu) such that it may be added to your preferred rqt perspective.
 - [utils](https://github.com/ethz-asl/mav_rtk_gps/tree/master/utils): collection of configurations and useful scripts.
 
 Impatient Users
