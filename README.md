@@ -45,6 +45,7 @@ Based on the initial work of Daniel Eckert.
 Contact
 -------
 Marco Tranzatto marcot(at)ethz.ch
+Kai Holtmann kaiho(at)ethz.ch
 
 
 Bugs & Feature Requests
