@@ -10,7 +10,7 @@ from collections import deque
 
 from Tkinter import *
 
-from piksi_rtk_msgs.msg import ReceiverState
+from piksi_rtk_msgs.msg import ReceiverState_V2_2_15
 from piksi_rtk_msgs.msg import UartState
 from piksi_rtk_msgs.msg import BaselineNed
 from piksi_rtk_msgs.msg import InfoWifiCorrections
@@ -146,7 +146,7 @@ class RtkInfoFrame:
         self.age_of_corrections_status.grid(row=current_row, column=1)
 
         # Subscribe to topics.
-        rospy.Subscriber(self.topic_names['piksi_receiver_state'], ReceiverState,
+        rospy.Subscriber(self.topic_names['piksi_receiver_state'], ReceiverState_V2_2_15,
                          self.receiver_state_callback)
         rospy.Subscriber(self.topic_names['piksi_uart_state'], UartState,
                          self.uart_state_callback)
@@ -197,10 +197,10 @@ class RtkInfoFrame:
         # Number of satellites.
         self.number_sat_status['text'] = str(msg.num_sat)
 
-        # Signal strength, use only one decimal digit.
+        # Signal strength.
         buffer = '['
         for single_signal_strength in msg.cn0:
-            buffer += str(round(single_signal_strength, 1)) + ', '
+            buffer += "%s, " % ord(single_signal_strength)
         # Remove last coma and space.
         buffer = buffer[:-2]
         buffer += ']'
