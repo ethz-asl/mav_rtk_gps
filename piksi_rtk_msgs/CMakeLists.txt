@@ -34,11 +34,22 @@ add_message_files(
   PosLlh.msg
   PosLlhMulti.msg
   ReceiverState.msg
+  ReceiverState_V2_2_15.msg
   TrackingState.msg
+  TrackingState_V2_2_15.msg
   UartState.msg
   UtcTimeMulti.msg
   VelEcef.msg
   VelNed.msg
+  AgeOfCorrections.msg
+)
+
+## Generate services in the 'srv' folder
+add_service_files(
+  FILES
+  SettingsWrite.srv
+  SettingsReadReq.srv
+  SettingsReadResp.srv
 )
 
 ## Generate added messages and services with any dependencies listed here
