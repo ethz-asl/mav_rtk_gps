@@ -8,6 +8,7 @@ namespace: 'auk'
 piksi_receiver_state_topic: 'piksi/debug/receiver_state'
 piksi_uart_state_topic: 'piksi/debug/uart_state'
 piksi_baseline_ned_topic: 'piksi/baseline_ned'
+piksi_age_of_corrections_topic: 'piksi/age_of_corrections'
 
 # MSF topics and services
 msf_odometry_topic: 'msf_core/odometry'

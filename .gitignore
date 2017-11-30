@@ -14,3 +14,6 @@ init_rovio_npose0/launch/debug_tf_frames.launch
 *.creator
 *.user
 *.config
+
+# Logs geodetic surveys
+piksi_multi_rtk_gps/log_surveys/2*.txt

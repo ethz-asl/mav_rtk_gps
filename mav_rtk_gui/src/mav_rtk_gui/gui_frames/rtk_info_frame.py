@@ -10,11 +10,12 @@ from collections import deque
 
 from Tkinter import *
 
-from piksi_rtk_msgs.msg import ReceiverState
+from piksi_rtk_msgs.msg import ReceiverState_V2_2_15
 from piksi_rtk_msgs.msg import UartState
 from piksi_rtk_msgs.msg import BaselineNed
 from piksi_rtk_msgs.msg import InfoWifiCorrections
 from sensor_msgs.msg import NavSatFix, NavSatStatus
+from piksi_rtk_msgs.msg import AgeOfCorrections
 
 wifiCorrectionsHzAverage = 5  # Compute corrections Hz over wifiCorrectionsHzAverage seconds
 altitudeAverageSamples = 10
@@ -137,8 +138,15 @@ class RtkInfoFrame:
         self.ping_corrections_wifi_status = Label(parent_window, text="-1", font="Sans 8")
         self.ping_corrections_wifi_status.grid(row=current_row, column=1)
 
+        # Age of correction.
+        current_row = current_row + 1
+        self.age_of_corrections_label = Label(parent_window, text="Age of corrections [deciseconds]: ", font="Sans 8")
+        self.age_of_corrections_label.grid(row=current_row)
+        self.age_of_corrections_status = Label(parent_window, text="-1", font="Sans 8")
+        self.age_of_corrections_status.grid(row=current_row, column=1)
+
         # Subscribe to topics.
-        rospy.Subscriber(self.topic_names['piksi_receiver_state'], ReceiverState,
+        rospy.Subscriber(self.topic_names['piksi_receiver_state'], ReceiverState_V2_2_15,
                          self.receiver_state_callback)
         rospy.Subscriber(self.topic_names['piksi_uart_state'], UartState,
                          self.uart_state_callback)
@@ -148,6 +156,8 @@ class RtkInfoFrame:
                          self.wifi_corrections_callback)
         rospy.Subscriber(self.topic_names['piksi_navsatfix_rtk_fix'], NavSatFix,
                          self.navsatfix_rtk_fix_callback)
+        rospy.Subscriber(self.topic_names['piksi_age_of_corrections'], AgeOfCorrections,
+                         self.age_of_corrections_callback)
 
     def get_topic_names(self):
         # RTK info topics
@@ -163,6 +173,8 @@ class RtkInfoFrame:
                                                                 'piksi/debug/wifi_corrections')
         topic_names['piksi_navsatfix_rtk_fix'] = rospy.get_param('~piksi_navsatfix_rtk_fix',
                                                                  'piksi/navsatfix_rtk_fix')
+        topic_names['piksi_age_of_corrections'] = rospy.get_param('~piksi_age_of_corrections_topic',
+                                                                  'piksi/age_of_corrections')
 
         # Check if we should add a leading namespace
         name_space = rospy.get_param('~namespace', '')
@@ -185,10 +197,10 @@ class RtkInfoFrame:
         # Number of satellites.
         self.number_sat_status['text'] = str(msg.num_sat)
 
-        # Signal strength, use only one decimal digit.
+        # Signal strength.
         buffer = '['
         for single_signal_strength in msg.cn0:
-            buffer += str(round(single_signal_strength, 1)) + ', '
+            buffer += "%s, " % ord(single_signal_strength)
         # Remove last coma and space.
         buffer = buffer[:-2]
         buffer += ']'
@@ -237,3 +249,6 @@ class RtkInfoFrame:
         self.altitude.append(msg.altitude)
         altitude_avg = sum(self.altitude) / len(self.altitude)
         self.altitude_status['text'] = str(round(altitude_avg, 2))
+
+    def age_of_corrections_callback(self, msg):
+        self.age_of_corrections_status['text'] = msg.age
