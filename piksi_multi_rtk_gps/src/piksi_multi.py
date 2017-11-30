@@ -140,11 +140,12 @@ class PiksiMulti:
         self.watchdog_time = rospy.get_rostime()
         self.messages_started = False
 
-        # Advertise topics.
+        # Advertise topics and services.
         self.publishers = self.advertise_topics()
+        self.service_servers = self.advertise_services()
 
-        # Create callbacks.
-        self.create_callbacks()
+        # Create topic callbacks.
+        self.create_topic_callbacks()
 
         # Init messages with "memory".
         self.receiver_state_msg = self.init_receiver_state_msg()
@@ -157,32 +158,10 @@ class PiksiMulti:
 
         self.handler.start()
 
-        # Reset service.
-        self.reset_piksi_service = rospy.Service(rospy.get_name() +
-                                                 '/reset_piksi',
-                                                 std_srvs.srv.SetBool,
-                                                 self.reset_piksi_service_callback)
-
         # Handle firmware settings services
         self.last_section_setting_read = []
         self.last_setting_read = []
         self.last_value_read = []
-        self.settings_write_service = rospy.Service(rospy.get_name() +
-                                                    '/settings_write',
-                                                    SettingsWrite,
-                                                    self.settings_write_server)
-        self.settings_read_req_service = rospy.Service(rospy.get_name() +
-                                                       '/settings_read_req',
-                                                       SettingsReadReq,
-                                                       self.settings_read_req_server)
-        self.settings_read_resp_service = rospy.Service(rospy.get_name() +
-                                                        '/settings_read_resp',
-                                                        SettingsReadResp,
-                                                        self.settings_read_resp_server)
-        self.settings_save_service = rospy.Service(rospy.get_name() +
-                                                   '/settings_save',
-                                                   std_srvs.srv.SetBool,
-                                                   self.settings_save_callback)
 
         # Only have start-up reset in base station mode
         if self.base_station_mode:
@@ -192,7 +171,7 @@ class PiksiMulti:
         # Spin.
         rospy.spin()
 
-    def create_callbacks(self):
+    def create_topic_callbacks(self):
         # Callbacks implemented "manually".
         self.handler.add_callback(self.pos_llh_callback, msg_type=SBP_MSG_POS_LLH)
         self.handler.add_callback(self.heartbeat_callback, msg_type=SBP_MSG_HEARTBEAT)
@@ -363,6 +342,40 @@ class PiksiMulti:
 
         return publishers
 
+    def advertise_services(self):
+        """
+        Advertise service servers.
+        :return: python dictionary, with service names used as keys and servers as values.
+        """
+        servers = {}
+
+        servers['reset_piksi'] = rospy.Service(rospy.get_name() +
+                                               '/reset_piksi',
+                                               std_srvs.srv.SetBool,
+                                               self.reset_piksi_service_callback)
+
+        servers['settings_write'] = rospy.Service(rospy.get_name() +
+                                                  '/settings_write',
+                                                  SettingsWrite,
+                                                  self.settings_write_server)
+
+        servers['settings_read_req'] = rospy.Service(rospy.get_name() +
+                                                     '/settings_read_req',
+                                                     SettingsReadReq,
+                                                     self.settings_read_req_server)
+
+        servers['settings_read_resp'] = rospy.Service(rospy.get_name() +
+                                                      '/settings_read_resp',
+                                                      SettingsReadResp,
+                                                      self.settings_read_resp_server)
+
+        servers['settings_save'] = rospy.Service(rospy.get_name() +
+                                                 '/settings_save',
+                                                 std_srvs.srv.SetBool,
+                                                 self.settings_save_callback)
+
+        return servers
+
     def ping_base_station_over_wifi(self):
         """
         Ping base station periodically without blocking the driver.
@@ -516,6 +529,20 @@ class PiksiMulti:
             self.publish_rtk_fix(msg.lat, msg.lon, msg.height)
         # Update debug msg and publish.
         self.receiver_state_msg.rtk_mode_fix = True if (msg.flags == PosLlhMulti.FIX_MODE_FIX_RTK) else False
+
+        if msg.flags == PosLlhMulti.FIX_MODE_INVALID:
+            self.receiver_state_msg.fix_mode = "Invalid"
+        elif msg.flags == PosLlhMulti.FIX_MODE_SPP:
+            self.receiver_state_msg.fix_mode = "SPP"
+        elif msg.flags == PosLlhMulti.FIX_MODE_DGNSS:
+            self.receiver_state_msg.fix_mode = "DGNSS"
+        elif msg.flags == PosLlhMulti.FIX_MODE_FLOAT_RTK:
+            self.receiver_state_msg.fix_mode = "Float_RTK"
+        elif msg.flags == PosLlhMulti.FIX_MODE_FIX_RTK:
+            self.receiver_state_msg.fix_mode = "Fixed_RTK"
+        else:
+            self.receiver_state_msg.fix_mode = "Invalid"
+
         self.publish_receiver_state_msg()
 
     def publish_spp(self, latitude, longitude, height):
@@ -692,17 +719,17 @@ class PiksiMulti:
 
             self.publish_receiver_state_msg()
 
-        #     def utc_time_callback(self, msg_raw, **metadata):
-        #         msg = MsgUtcTime(msg_raw)
-        #
-        #         # check i message is valid
-        #         if msg.flags & 0x01 == True: # msg valid TODO: use bitmask instead
-        #             # TODO: calc delta_t to rospy.Time.now()
-        #             # delta_t_vec.append(delta_t)
-        #             # self.delta_t_MA = moving_average_filter(delta_t_vec, N)
-        #             return
-        #         else: # msg invalid
-        #             return
+            #     def utc_time_callback(self, msg_raw, **metadata):
+            #         msg = MsgUtcTime(msg_raw)
+            #
+            #         # check i message is valid
+            #         if msg.flags & 0x01 == True: # msg valid TODO: use bitmask instead
+            #             # TODO: calc delta_t to rospy.Time.now()
+            #             # delta_t_vec.append(delta_t)
+            #             # self.delta_t_MA = moving_average_filter(delta_t_vec, N)
+            #             return
+            #         else: # msg invalid
+            #             return
 
     def publish_receiver_state_msg(self):
         self.receiver_state_msg.header.stamp = rospy.Time.now()
