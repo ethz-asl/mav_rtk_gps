@@ -10,6 +10,10 @@ If you have Navigation Satellite fix measurements (Latitude, Longitude and Altit
 
 Parameters `pose_sensor/init/q_*` and `pose_sensor/init/p_*` can be obtained with [Kalibr](https://github.com/ethz-asl/kalibr).
 
+Dependencies
+------
+  * [ethz\_piksi\_ros](https://github.com/ethz-asl/ethz_piksi_ros)
+
 Published and subscribed topics/services
 ------
 

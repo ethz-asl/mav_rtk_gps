@@ -30,5 +30,6 @@ catkin_package(
     geometry_msgs
     rovio
     tf
+    piksi_multi_rtk_gps
 #  DEPENDS
 )
