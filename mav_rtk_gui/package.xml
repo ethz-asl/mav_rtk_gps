@@ -15,6 +15,5 @@
   <depend>rospy</depend>
   <depend>piksi_rtk_msgs</depend>
   <depend>nav_msgs</depend>
-  <depend>piksi_multi_rtk_gps</depend>
+  <depend>piksi_multi_rtk_ros</depend>
 </package>
-
