@@ -24,7 +24,7 @@ catkin_package(
   CATKIN_DEPENDS
     piksi_rtk_msgs
     nav_msgs
-    piksi_multi_rtk_gps
+    piksi_multi_rtk_ros
 #  DEPENDS
 )
 
